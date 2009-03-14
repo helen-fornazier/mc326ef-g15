@@ -12,8 +12,8 @@ Utilizaremos o svn.
 
  ** crie uma pasta ex: mkdir MC326
 
- ** copie o comando do link http://code.google.com/p/mc326-ffkj/source/checkout e qnd perguntado utilize a senha no link logo abaixo
-   ex: svn checkout https://mc326-ffkj.googlecode.com/svn/trunk/ mc326-ffkj --username felipegasparini
+ ** copie o comando do link http://code.google.com/p/mc326ef-g15/source/checkout e qnd perguntado utilize a senha no link logo abaixo
+   ex: svn checkout https://mc326ef-g15.googlecode.com/svn/trunk/ mc326ef-g15 --username Helen.Fornazier
 
 * checkin - eh a operacao de enviar os arquivos para o repositorio e criar uma nova versao
 
