@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include"liblab01.h"
 
+
 #define ARQUIVO "palavras.txt"
 #define PARAMETERS 4
 #define ERRO1 "too few arguments to function int main\n"
