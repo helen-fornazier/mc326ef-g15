@@ -8,9 +8,9 @@ Para instalar o svn (subversion) digite:
         sudo apt-get install subversion
 
 = Downloading File =
-    Para baixar os arquivos digite em um apasta qualquer em que pretende armazenar os arquivos o comando que esta escrito na aba Source e a senha que está em um link abaixo.
+    Para baixar os arquivos digite em um apasta qualquer em que pretende armazenar os arquivos o comando que esta escrito na aba Source (http://code.google.com/p/mc326ef-g15/source/checkout) e a senha que está em um link abaixo.
         
-Obs: este comando só é necessário uma vez, as outras vezes é só svn up que ele atualiza os arquivos
+Obs: este comando só é necessário uma vez, as outras vezes é só svn update que ele atualiza os arquivos
 
      Para atualizar digite     svn up
 
