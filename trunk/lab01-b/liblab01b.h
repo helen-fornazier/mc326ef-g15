@@ -78,3 +78,14 @@ void FreeTr(node* tree);
   de divider se encontrar na primeira posição, retorna NULL, e se não houver um dos caracteres
   retorna uma cópia de str */
 char* CutStr(char* str, char* divider);
+
+/*Devolve uma cópia da primeira string que aparecer em str limitado pelo caractere em divider,
+ pulando os primeiros caracteres:             OBS: Não modifica a string original.
+ texto= “,*Cama e + Banho.” e SEP=”, +*.” (o branco está depois da virgula) a rotina deve
+ retornar “Cama */
+char* FirstStr(char* str, char* divider);
+
+/*Similar a FirstStr, só que modifica a string str com o resto da string
+  Ex: str = "BOLO# DE CHOCOLATE"  divider = "#" a função deve retornar "BOLO"
+   e str deve ser modificado para "# DE CHOCOLATE"*/
+char *FirstStrM(char **str, char *divider);   //NÃO ESTÁ MODIFICANDO str ..  VER O CÓDIGO DE NOVO

@@ -245,12 +245,8 @@ void FreeTr(node* tree){
   de divider se encontrar na primeira posição, retorna NULL, e se não houver um dos caracteres
   retorna uma cópia de str. Se um dos parâmetros for NULL, imprime uma mensagem de erro e retorna NULL */
 char* CutStr(char* str, char* divider){
-  if(str == NULL){
-    printf("Err. Funtion CutStr. First string NULL\n");
-    return NULL;
-  }
-  if(divider == NULL){ 
-    printf("Err. Funtion CutStr. Second string NULL\n");
+  if(str == NULL || divider == NULL){
+    printf("Err. Funtion CutStr. Parameters maybe NULL\n");
     return NULL;
   }
 
@@ -263,6 +259,52 @@ char* CutStr(char* str, char* divider){
   }
 }
 
+/*Devolve uma cópia da primeira string que aparecer em str limitado pelo caractere em divider,
+ pulando os primeiros caracteres:
+ texto= “,*Cama e + Banho.” e SEP=”, +*.” (o branco está depois da virgula) a rotina deve
+ retornar “Cama */
+char* FirstStr(char* str, char* divider){
+if(str == NULL || divider == NULL){
+    printf("Err. Funtion CutStr. Parameters maybe NULL\n");
+    return NULL;
+  }
+
+  char* strout =CutStr(str,divider);
+  int i =0, len = strlen(str);
+  
+  for(i=0; i<len && strout==NULL ; i++){
+     strout = CutStr(&str[i],divider);
+  }
+return strout;
+}
 
 
-void input(){}
+/*Similar a FirstStr, só que modifica a string str com o resto da string
+  Ex: str = "BOLO# DE CHOCOLATE"  divider = "#" a função deve retornar "BOLO"
+   e str deve ser modificado para "# DE CHOCOLATE"*/
+char *FirstStrM(char **str, char *divider){
+  if(str == NULL || divider == NULL || *str == NULL){
+    printf("Err. Funtion CutStr. Parameters maybe NULL\n");
+    return NULL;
+  }
+
+  char* strout =CutStr(*str,divider);
+  int i =0, len = strlen(*str);
+  
+  for(i=0; i<len && strout==NULL ; i++){
+    strout = CutStr(str[i],divider);
+  }  // ATÉ AQUI É O MESMO CÓDIGO DE FirstStr
+  if(strout == NULL) return strout;
+  else{
+    //char* temp = NULL;
+    int j = strlen(strout);
+    char* temp2 = strdup(*str);
+    char* temp = strdup(&(temp2[j+i])); //SE EU COLOCAR O *str AQUI NÃO DÁ CERTO .. POR ISSO COPIO O TEMP
+ 
+    //temp = strndup(temp2[sizeof(char)*i +j+1], len-j);
+    //free(*str);
+    free(temp2);
+    (*str) = temp; //NÃO ESTÁ ALTERANDO QND SAI DA FUNÇÃO .. NÃO SEI O PORQUEEE
+  }
+  return strout;
+}
