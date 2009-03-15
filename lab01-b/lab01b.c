@@ -8,26 +8,34 @@
 #define ERRO1 "too few arguments to function int main\n"
 #define ERRO2 "too many arguments to function int main\n"
 #define ERRO3 "argument 3 is not a character\n"
-#define STRPOSITION argc-3
+#define STRPOSITION argc-1
 #define CHRPOSITION argc-2
 #define WORDPOSITION argc -1
+#define SEPARATOR "#"
 
 int main(int argc, char* argv[]){
 /***************** error message */
-    if(argc < PARAMETERS){
+ /*   if(argc < PARAMETERS){
         perror(ERRO1);
-        return 1;
+    //    return 1;
     }
     else if(argc > PARAMETERS){
         perror(ERRO2);
-        return 1;
+    //    return 1;
     }
-    if(strlen(argv[CHRPOSITION])!=1) perror(ERRO3);    
+    if(strlen(argv[CHRPOSITION])!=1) perror(ERRO3);    */
 /*****************/
-
+    int i=0;
+    int nwor = 0;
+    /*char** tablet = input(argv[STRPOSITION], &nwor, SEPARATOR);
+    for(i=0; i<nwor; i++){
+        printf("%s\n", tablet[i]);
+    }*/
+/*
     FILE* f = fopen(ARQUIVO, "w");
     int nwords, i;
     node* tree = NULL;
+
     char* shift = Shifter(argv[STRPOSITION]); //transformando a frase recebida em maiuscula
     char* clean = Cleaner(argv[STRPOSITION]); //limpando os caracteres indesejaveis
     char** table = Divider(shift, &nwords); //dividindo em uma tabela de palavras
@@ -37,12 +45,12 @@ int main(int argc, char* argv[]){
     }
     PrintNodeF(tree,f); //imprimindo no arquivo
     printf("%s\n", clean); //imprimindo a string sem pontuacao na tela
-
-    /****finalizando***/
+*/
+    /****finalizando**
     fclose(f);
     free(clean);
     free(shift);
     FreeT(table,nwords);
-    FreeTr(tree);
+    FreeTr(tree);*/
     return 0;
 }

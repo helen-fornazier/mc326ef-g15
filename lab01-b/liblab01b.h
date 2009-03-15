@@ -53,3 +53,8 @@ void FreeT(char** table, int nword);
 
 /*Libera uma árvore com nodes do tipo structure node*/
 void FreeTr(node* tree);
+
+/*Conta strings em str, considerando os separadores em accept
+ * Ex: str = "@#@Bolo#De #Chocolate Congelado@"  accept = "#@"    
+ * o valor retornado é 3 strings entre separadores*/
+int CountStrStr(char* str, char* accept);

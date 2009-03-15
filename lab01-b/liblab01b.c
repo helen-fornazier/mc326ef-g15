@@ -188,3 +188,36 @@ void FreeTr(node* tree){
         FreeTr(tree->right);
         free(tree->word);
 }
+
+/*Conta strings em str, considerando os separadores em accept
+ * Ex: str = "@#@Bolo#De #Chocolate Congelado@"  accept = "#@"    o valor retornado é 3 strings entre separadores*/
+int CountStrStr(char* str, char* accept){
+  int count = 0;
+     if(str == NULL) return 0; //Se str vazia .. não tem string
+     else if(accept == NULL) return 1; //Se não há separadores devolta 1 que é o número de strings total
+  int tam = strlen(str);
+  char* point1 = strpbrk(str, accept); //point1 vai ateh o primeiro separador
+     if(point1==NULL) return 1; //Se não encontrou retorne 1
+     if(point1 != str) count++; //Se o primeiro que foi encontrado não está no começo, quer dizer que encontrou uma string
+     if(point1 == &str[tam-1]) return count; //Se p1 parou no ultimo caractere, pare
+
+  char* point2 = NULL;//Ponteiro que seque o point1, se eles deixarem de ser seguidos, significa que há uma string
+
+  while(point1!=NULL){
+    point2 = strpbrk(point1, accept); //Avance 
+    point1 = strpbrk(&point1[1], accept); //Avance
+    
+    if(&point2[1] != point1 ) count++;  //Se p1 e p2 não estão em seguida, conte uma string
+    if(point1 == &str[tam-1]) return count; //Se p1 parou no ultimo caractere, pare
+  }
+  
+  return count;
+}
+
+/*Devolve uma string cortada ao encontrar em str algum algarismo de spr.
+ * Se não encontrar um dos algarismos, retorna uma cópia de str */
+char** DivStrSpr(char* str, int* nstr, char* spr){
+    
+}
+
+void input(){}
