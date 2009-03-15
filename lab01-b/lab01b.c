@@ -4,30 +4,34 @@
 
 
 #define ARQUIVO "palavras.txt"
-#define PARAMETERS 4
+#define PARAMETERS 2
 #define ERRO1 "too few arguments to function int main\n"
 #define ERRO2 "too many arguments to function int main\n"
 #define ERRO3 "argument 3 is not a character\n"
 #define STRPOSITION argc-1
 #define CHRPOSITION argc-2
 #define WORDPOSITION argc -1
-#define SEPARATOR "#"
+#define DIVIDER "#"
 
 int main(int argc, char* argv[]){
 /***************** error message */
- /*   if(argc < PARAMETERS){
+    if(argc < PARAMETERS){
         perror(ERRO1);
-    //    return 1;
+        return 1;
     }
     else if(argc > PARAMETERS){
         perror(ERRO2);
-    //    return 1;
+        return 1;
     }
-    if(strlen(argv[CHRPOSITION])!=1) perror(ERRO3);    */
+    
 /*****************/
-    int i=0;
-    int nwor = 0;
-    /*char** tablet = input(argv[STRPOSITION], &nwor, SEPARATOR);
+    int nparam=0;
+    char** input = Divider2(argv[STRPOSITION], DIVIDER, &nparam);
+    PrintTable(input, nparam);
+    FreeT(input);
+    //int i=0;
+    //int nwor = 0;
+    /*char** tablet = input(argv[STRPOSITION], &nwor, DIVIDER);
     for(i=0; i<nwor; i++){
         printf("%s\n", tablet[i]);
     }*/
