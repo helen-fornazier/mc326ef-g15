@@ -2,18 +2,20 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<ctype.h>
+#include"liblab01b.h"
+
 #define SPACE ' '
 #define EOS '\0' /* End Of Sentence  */
 
 /*Definicao de palavra: Todo agrupamento formado por caracteres alfanumericos*/
 
 /*Take out signals different from letters or numbers from a string*/
-/*Substitui caracteres nao alfanumericos por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes*/
+/*Substitui caracteres em remove por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes*/
 char* Cleaner(char *str, char *remove){
     char *strout=strdup(str);
     char *temp;
-    while(strpbrk(remove,strout)!=NULL){
-        temp=strpbrk(remove,strout);
+    while(strpbrk(strout, remove)!=NULL){
+      temp=strpbrk(strout, remove);
         *temp=SPACE;
     }
     return strout;
@@ -56,30 +58,47 @@ char* Shifter(char *str){
 }
 
 /*Retorna o numero de palavras em str*/
-int WordCount(char *str, char *divider){
+int WordCount(char *str){
     int i, words=0;
-    char *temp=str, *temp2=str;
-    for(i=0;temp2!=NULL;i++){
-        temp2=strpbrk(divider,temp);
-        if((temp2-temp)>=sizeof(char)){
+    for(i=0;str[i]!=EOS;i++){
+        if(isalnum(str[i])){
             words++;
-            temp=temp2+sizeof(char);
-        }        
+            while(isalnum(str[i+1])) i++;    
+        }
     }
-    if(strpbrk(divider,&(str[strlen(str)]))!=NULL) words++;
     return words;
 }
 
+/*Conta strings em str, considerando os separadores em accept
+ * Ex: str = "Bolo#De #Chocolate Congelado@"  divider = "#@"    o valor retornado é 3 strings entre separadores*/
+int StrCount(char *str, char *divider){
+    int i, nstr=0;
+    char *temp=str, *temp2=str;
+    for(i=0;temp2!=NULL;i++){
+      temp2=strpbrk(temp, divider);
+        if((temp2-temp>=sizeof(char) && temp2!=NULL)){
+            nstr++;
+        }
+	
+	temp=temp2+sizeof(char);
+    }
+    if(strpbrk(&(str[strlen(str)-1]),divider)==NULL) nstr++;
+    return nstr;
+}
+
+
+/*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
+ e nword sai da função com o número de strings na tabela*/
 char** Divider(char *str, int *words, char *divider){
     int k=0,i;
     char **table, *temp, *temp2;
     temp=str;
     
 
-    *words=WordCount(divider,str);
+    *words=StrCount(str,divider);
     table=(char**)malloc(sizeof(char)*(*words));
     while(k<*words){
-        temp2=strpbrk(divider,temp);
+        temp2=strpbrk(temp, divider);
         if(temp2-temp>=sizeof(char)){
             table[k]=(char*)malloc(temp2-temp+1);
             for(i=0;temp!=temp2;i++){
@@ -94,6 +113,35 @@ char** Divider(char *str, int *words, char *divider){
     }
     return table;
 }
+
+/*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
+ e nword sai da função com o número de strings na tabela*/
+char** Divider2(char* str, char* divider, int* nword){
+  *nword = StrCount(str,divider); //Conta o número de strings
+  char** table = (char**)malloc(sizeof(char)*(*nword)); //Malloca no tamanho certo
+  if(table == NULL){
+    printf("Error in function malloc Inside function Divider2\n");
+  }
+  int i=0;
+  
+  for(i=0; i<*nword; i++){ //Iincializa table. Testado: se não inicializar antes, com muitos separadores não dá certo
+    table[i] = NULL;
+  }
+
+  char* temp = str;
+ 
+  for(i=0; i<*nword;){
+    table[i] = CutStr(temp,divider); //Corte a string
+    if(table[i]!=NULL){ //Se um separador não estiver na primeira posição
+      temp = &temp[strlen(table[i])]; //temp vai além da string que já foi armazenada em table[i]
+      i++; 
+    }
+    else temp = &temp[1]; //Se o separador estiver na primeira posição, avance um para cortar denovo
+  }
+  return table;
+}
+
+
 /*Retorna o numero de vezes em que o caractere c aparece em str*/
 int CountChrStr(char* str, char c){
     int total=0;
@@ -123,13 +171,6 @@ int FindWord(char **table, int words, char *word){
     return total;
 }
 
-/*Estrutura para guardar a palavra e o numero de vezes em que ela aparece no texto*/
-typedef struct node{
-    char *word;
-    int count;
-    struct node *left;
-    struct node *right;
-} node;
 
 /*Cria um no com uma copia de word e com count 1*/
 node* NewNode(char *word){
@@ -178,6 +219,14 @@ void FreeT(char** table, int nword){
 	free(table);
 }
 
+/*Imprime uma tabela de strings (table) sendo len o número de strings que ela contém*/
+void PrintTable(char** table, int len){
+  int i=0;
+  for(i=0; i<len; i++){
+    printf("%s\n", table[i]);
+  }
+}
+
 /*Libera uma árvore com nodes do tipo structure node*/
 void FreeTr(node* tree){
         if(tree==NULL){
@@ -189,35 +238,31 @@ void FreeTr(node* tree){
         free(tree->word);
 }
 
-/*Conta strings em str, considerando os separadores em accept
- * Ex: str = "@#@Bolo#De #Chocolate Congelado@"  accept = "#@"    o valor retornado é 3 strings entre separadores*/
-int CountStrStr(char* str, char* accept){
-  int count = 0;
-     if(str == NULL) return 0; //Se str vazia .. não tem string
-     else if(accept == NULL) return 1; //Se não há separadores devolta 1 que é o número de strings total
-  int tam = strlen(str);
-  char* point1 = strpbrk(str, accept); //point1 vai ateh o primeiro separador
-     if(point1==NULL) return 1; //Se não encontrou retorne 1
-     if(point1 != str) count++; //Se o primeiro que foi encontrado não está no começo, quer dizer que encontrou uma string
-     if(point1 == &str[tam-1]) return count; //Se p1 parou no ultimo caractere, pare
 
-  char* point2 = NULL;//Ponteiro que seque o point1, se eles deixarem de ser seguidos, significa que há uma string
 
-  while(point1!=NULL){
-    point2 = strpbrk(point1, accept); //Avance 
-    point1 = strpbrk(&point1[1], accept); //Avance
-    
-    if(&point2[1] != point1 ) count++;  //Se p1 e p2 não estão em seguida, conte uma string
-    if(point1 == &str[tam-1]) return count; //Se p1 parou no ultimo caractere, pare
+/*Devolve uma cópia da string str cortada até o primeiro caractere que se encontra no divider
+  Ex: str = "Bolo#de cholocate#@" divider = "#@"    devolverá a string "Bolo". Se um dos caracteres
+  de divider se encontrar na primeira posição, retorna NULL, e se não houver um dos caracteres
+  retorna uma cópia de str. Se um dos parâmetros for NULL, imprime uma mensagem de erro e retorna NULL */
+char* CutStr(char* str, char* divider){
+  if(str == NULL){
+    printf("Err. Funtion CutStr. First string NULL\n");
+    return NULL;
   }
-  
-  return count;
+  if(divider == NULL){ 
+    printf("Err. Funtion CutStr. Second string NULL\n");
+    return NULL;
+  }
+
+  char* temp = strpbrk(str, divider);
+  if(temp == NULL) return strdup(str);
+  if(temp == str) return NULL;
+  else{
+    char* strout = strndup(str, strlen(str)-strlen(temp));
+    return strout;
+  }
 }
 
-/*Devolve uma string cortada ao encontrar em str algum algarismo de spr.
- * Se não encontrar um dos algarismos, retorna uma cópia de str */
-char** DivStrSpr(char* str, int* nstr, char* spr){
-    
-}
+
 
 void input(){}
