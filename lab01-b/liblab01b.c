@@ -9,11 +9,13 @@
 
 /*Take out signals different from letters or numbers from a string*/
 /*Substitui caracteres nao alfanumericos por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes*/
-char* Cleaner(char *str){
-    int i;
+char* Cleaner(char *str, char *remove){
     char *strout=strdup(str);
-    for(i=0;strout[i]!=EOS;i++)
-        if(!isalnum(str[i])) strout[i]=SPACE;
+    char *temp;
+    while(strpbrk(remove,strout)!=NULL){
+        temp=strpbrk(remove,strout);
+        *temp=SPACE;
+    }
     return strout;
 }
 
@@ -54,36 +56,44 @@ char* Shifter(char *str){
 }
 
 /*Retorna o numero de palavras em str*/
-int WordCount(char *str){
+int WordCount(char *str, char *divider){
     int i, words=0;
-    for(i=0;str[i]!=EOS;i++){
-        if(isalnum(str[i])){
+    char *temp=str, *temp2=str;
+    for(i=0;temp2!=NULL;i++){
+        temp2=strpbrk(divider,temp);
+        if((temp2-temp)>=sizeof(char)){
             words++;
-            while(isalnum(str[i+1])) i++;    
-        }
+            temp=temp2+sizeof(char);
+        }        
     }
+    if(strpbrk(divider,&(str[strlen(str)]))!=NULL) words++;
     return words;
 }
 
-/*Divide a string with a sentence in it's words*/
-/*Coloca cada palavra da string str em uma posicao diferente da tabela.No final da funcao words recebe o numero de palavras na tabela. Nao modifica a string str. Retorna o apontador da matriz de palavras*/
-char** Divider(char *str, int *words){
-    int i, j, k=0;
-    *words=WordCount(str);
-    char **table=(char**)malloc(sizeof(char*)*(*words)); //Tabela com espaco para a exata quantidade de palavras existentes em str
-    for(i=0;k<*words;i++){
-        j=i; //j eh marcador do inicio da palavra enquanto i eh do caractere logo apos a palavra, e k o da tabela
-        while(isalnum(str[i])) i++;
-        if(j!=i){ //se ha uma palavra, maloca um espaco e copia para a tabela
-            table[k]=(char*)malloc(sizeof(char)*(i-j+1));
-            strncpy(table[k], &str[j], sizeof(char)*(i-j));
+char** Divider(char *str, int *words, char *divider){
+    int k=0,i;
+    char **table, *temp, *temp2;
+    temp=str;
+    
+
+    *words=WordCount(divider,str);
+    table=(char**)malloc(sizeof(char)*(*words));
+    while(k<*words){
+        temp2=strpbrk(divider,temp);
+        if(temp2-temp>=sizeof(char)){
+            table[k]=(char*)malloc(temp2-temp+1);
+            for(i=0;temp!=temp2;i++){
+                table[k][i]=*temp;
+                temp+=sizeof(char);
+            }
             k++;
         }
-        if(str[i]==EOS) break;
+        if(temp2==NULL){
+            table[k]=strdup(temp);
+        }
     }
     return table;
 }
-
 /*Retorna o numero de vezes em que o caractere c aparece em str*/
 int CountChrStr(char* str, char c){
     int total=0;
