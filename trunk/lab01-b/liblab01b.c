@@ -259,9 +259,10 @@ char* CutStr(char* str, char* divider){
   }
 }
 
+
 /*Devolve uma cópia da primeira string que aparecer em str limitado pelo caractere em divider,
- pulando os primeiros caracteres:
- texto= “,*Cama e + Banho.” e SEP=”, +*.” (o branco está depois da virgula) a rotina deve
+ pulando os primeiros caracteres:             OBS: Não modifica a string original.
+ str= “,*Cama e + Banho.” e divider=”, +*.” (o branco está depois da virgula) a rotina deve
  retornar “Cama */
 char* FirstStr(char* str, char* divider){
 if(str == NULL || divider == NULL){
@@ -278,33 +279,25 @@ if(str == NULL || divider == NULL){
 return strout;
 }
 
-
-/*Similar a FirstStr, só que modifica a string str com o resto da string
-  Ex: str = "BOLO# DE CHOCOLATE"  divider = "#" a função deve retornar "BOLO"
-   e str deve ser modificado para "# DE CHOCOLATE"*/
-char *FirstStrM(char **str, char *divider){
-  if(str == NULL || divider == NULL || *str == NULL){
-    printf("Err. Funtion CutStr. Parameters maybe NULL\n");
+/*Faz a mesma coisa que FirstStr só que leng é o índice onde se inicia srt e soma com o número de caracteres que ele andou em str.
+ * leng = 0, str= “,*Cama e + Banho.” e divider=”, +*.” (o branco está depois da virgula) a rotina deve retornar “Cama" e leng = leng + 6
+ * Na próxima chamada da função, len = 6, str = *“,*Cama e + Banho.”, e divider=”, +*.”, como leng inicialmente vale 6, a palavra que ele
+ * irá retornar é "e" e leng = leng + 1.*/
+char* FirstStrL(char* str, char* divider, int* leng){
+    if(str == NULL || divider == NULL){
+    printf("Err. Funtion FirstStrL. Parameters maybe NULL\n");
     return NULL;
-  }
+    }
 
-  char* strout =CutStr(*str,divider);
-  int i =0, len = strlen(*str);
+    char* strout =CutStr(&str[*leng],divider);
+    int i =0, len = strlen(&str[*leng]);
   
-  for(i=0; i<len && strout==NULL ; i++){
-    strout = CutStr(str[i],divider);
-  }  // ATÉ AQUI É O MESMO CÓDIGO DE FirstStr
-  if(strout == NULL) return strout;
-  else{
-    //char* temp = NULL;
-    int j = strlen(strout);
-    char* temp2 = strdup(*str);
-    char* temp = strdup(&(temp2[j+i])); //SE EU COLOCAR O *str AQUI NÃO DÁ CERTO .. POR ISSO COPIO O TEMP
- 
-    //temp = strndup(temp2[sizeof(char)*i +j+1], len-j);
-    //free(*str);
-    free(temp2);
-    (*str) = temp; //NÃO ESTÁ ALTERANDO QND SAI DA FUNÇÃO .. NÃO SEI O PORQUEEE
-  }
-  return strout;
+    for(i=0; i<len && strout==NULL ; i++){
+         strout = CutStr(&str[i+(*leng)],divider);
+     }
+
+    (*leng) = (*leng) + i + strlen(strout);
+    return strout;
 }
+
+
