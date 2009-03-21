@@ -81,11 +81,13 @@ char* CutStr(char* str, char* divider);
 
 /*Devolve uma cópia da primeira string que aparecer em str limitado pelo caractere em divider,
  pulando os primeiros caracteres:             OBS: Não modifica a string original.
- texto= “,*Cama e + Banho.” e SEP=”, +*.” (o branco está depois da virgula) a rotina deve
+ str= “,*Cama e + Banho.” e divider=”, +*.” (o branco está depois da virgula) a rotina deve
  retornar “Cama */
 char* FirstStr(char* str, char* divider);
 
-/*Similar a FirstStr, só que modifica a string str com o resto da string
-  Ex: str = "BOLO# DE CHOCOLATE"  divider = "#" a função deve retornar "BOLO"
-   e str deve ser modificado para "# DE CHOCOLATE"*/
-char *FirstStrM(char **str, char *divider);   //NÃO ESTÁ MODIFICANDO str ..  VER O CÓDIGO DE NOVO
+/*Faz a mesma coisa que FirstStr só que leng é o índice onde se inicia srt e soma com o número de caracteres que ele andou em str.
+ * leng = 0, str= “,*Cama e + Banho.” e divider=”, +*.” (o branco está depois da virgula) a rotina deve retornar “Cama" e leng = leng + 6
+ * Na próxima chamada da função, len = 6, str = *“,*Cama e + Banho.”, e divider=”, +*.”, como leng inicialmente vale 6, a palavra que ele
+ * irá retornar é "e" e leng = leng + 1.*/
+char* FirstStrL(char* str, char* divider, int* leng);
+
