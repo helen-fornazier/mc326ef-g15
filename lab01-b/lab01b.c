@@ -4,54 +4,77 @@
 
 
 #define ARQUIVO "palavras.txt"
-#define PARAMETERS 4
-#define ERRO1 "too few arguments to function int main\n"
-#define ERRO2 "too many arguments to function int main\n"
-#define ERRO3 "argument 3 is not a character\n"
-#define STRPOSITION argc-1
-#define CHRPOSITION argc-2
-#define WORDPOSITION argc -1
+#define PARAMETERS 3   //Número dos parâmetros passados no int main, pode sem 3 ou 2
+#define ARGPS 1
 #define SEPARATOR "#"
+#define NSPEC 3
+#define DIVIDER ",;!.?():"
+#define LENGUAGE "Eng"
 
 int main(int argc, char* argv[]){
 /***************** error message */
-   if(argc < PARAMETERS){
-        perror(ERRO1);
-    //    return 1;
+    if(argc==3){
+        if(MakeMsg(argv[2]))
+            MakeMsg(LENGUAGE);
+    }    
+    else
+        MakeMsg(LENGUAGE);
+   
+    if(argc<2) Msg(0);
+    if(argc>3) Msg(1);
+    int nimput = 0;
+    char **imput = Divider2(argv[ARGPS], SEPARATOR, &nimput);
+
+    if(imput==NULL) Msg(6);
+    if(nimput<NSPEC){
+        Msg(3);
+        return 1;
     }
-    else if(argc > PARAMETERS){
-        perror(ERRO2);
-    //    return 1;
+    if(nimput>NSPEC){
+        Msg(4);
+        return 1;
     }
-   // if(strlen(argv[CHRPOSITION])!=1) perror(ERRO3);    
+    if(strlen(imput[1])!=1) Msg(2);
+    
 /*****************/
-    int i=0;
-    int nwor = 0;
- //   char** tablet = input(argv[STRPOSITION], &nwor, SEPARATOR);
-    char **tablet = Divider2(argv[STRPOSITION], SEPARATOR, &nwor);
-    for(i=0; i<nwor; i++){
-        printf("%s\n", tablet[i]);
-    }
-/*
+
     FILE* f = fopen(ARQUIVO, "w");
+    if(f==NULL) Msg(8);
     int nwords, i;
     node* tree = NULL;
-
-    char* shift = Shifter(argv[STRPOSITION]); //transformando a frase recebida em maiuscula
-    char* clean = Cleaner(argv[STRPOSITION]); //limpando os caracteres indesejaveis
-    char** table = Divider(shift, &nwords); //dividindo em uma tabela de palavras
+    char* shift = Shifter(imput[0]); //transformando a frase recebida em maiuscula
+    if(shift==NULL) Msg(6);
+    char* shiftC = Shifter(imput[1]); //tranformando a letra recebida em maiúscula
+    if(shiftC==NULL) Msg(6);
+    char* shiftPal = Shifter(imput[2]); //transformando a palavra em maiúscula
+    if(shiftPal==NULL) Msg(6);
+    char* clean = Cleaner(imput[0], DIVIDER); //limpando os caracteres indesejaveis
+    if(clean==NULL) Msg(6);
+    char* correct = Corrector(clean); //Removendo os espaços sobrando
+    if(correct==NULL) Msg(6);
+    char** table = DividerW(shift, &nwords); //dividindo em uma tabela de palavras
+    if(table==NULL) Msg(6);
 
     for(i=0; i<nwords; i++){
-        InsertNode(&tree, table[i]); //inserindo as palavras na arvore de organizacao
+                InsertNode(&tree, table[i]); 
     }
-    PrintNodeF(tree,f); //imprimindo no arquivo
-    printf("%s\n", clean); //imprimindo a string sem pontuacao na tela
-*/
-    /****finalizando**
+
+    if(tree==NULL) Msg(9);
+    Msg(10);
+    printf("=> %d\n", CountChrStr(shift, shiftC[0])); //imprimindo a quantidade de vezes em que c aparece no texto
+    Msg(11);
+    printf("=> %d\n", FindWord(table, nwords, shiftPal)); //imprimindo a quantidade de vezes em que pal aparece no texto
+    Msg(12);
+    printf("=> %s\n", clean); //imprimindo a string sem pontuacao na tela
+    Msg(13);
+    printf("=> %s\n", correct);
+
+    /****finalizando**/
     fclose(f);
     free(clean);
     free(shift);
     FreeT(table,nwords);
-    FreeTr(tree);*/
+    FreeT(imput,nimput);
+    FreeTr(tree);
     return 0;
 }

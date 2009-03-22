@@ -7,7 +7,7 @@
 #define SPACE ' '
 #define EOS '\0' /* End Of Sentence  */
 
-char **msg //where will be placed all messages from the program
+char **msg; //where will be placed all messages from the program
 
 /*Definicao de palavra: Todo agrupamento formado por caracteres alfanumericos*/
 
@@ -15,6 +15,9 @@ char **msg //where will be placed all messages from the program
 /*Substitui caracteres em remove por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes,
  * ou se não houver, retorna uma cópia de str. Retorna NULL se houver falta de memória, ou se foi passado str NULL*/
 char* Cleaner(char *str, char *remove){
+    if(str==NULL) return NULL;
+    if(remove == NULL) return strdup(str);
+
     char *strout=strdup(str);
     if(strout==NULL) return NULL;
 
@@ -94,6 +97,7 @@ int WordCount(char *str){
  * o valor retornado é 3 strings entre separadores*/
 int StrCount(char *str, char *divider){
     if(str==NULL) return 0;
+
 
     int i, nstr=0;
     char *temp=str, *temp2=str;
@@ -175,6 +179,32 @@ char** Divider2(char* str, char* divider, int* nword){
 }
 
 
+/*Similar a Divider, só que considera como divisor tudo o que não é alfanumérico*/
+char** DividerW(char *str, int *words){
+    if(str==NULL){
+        *words = 0;
+        return NULL;
+    }
+    int i, j, k=0;
+    *words=WordCount(str);
+     char **table=(char**)malloc(sizeof(char*)*(*words)); //Tabela com espaco para a exata quantidade de palavras existentes em str
+     if(table==NULL) return NULL;
+
+     for(i=0;k<*words;i++){
+          j=i; //j eh marcador do inicio da palavra enquanto i eh do caractere logo apos a palavra, e k o da tabela
+          while(isalnum(str[i])) i++;
+          if(j!=i){ //se ha uma palavra, maloca um espaco e copia para a tabela
+              table[k]=(char*)malloc(sizeof(char)*(i-j+1));
+              if(table[k]==NULL) return NULL;
+
+              strncpy(table[k], &str[j], sizeof(char)*(i-j));
+              k++;
+          }
+          if(str[i]==EOS) break;
+     }
+     return table;
+}
+
 /*Retorna o numero de vezes em que o caractere c aparece em str*/
 int CountChrStr(char* str, char c){
     if(str==NULL) return 0;
@@ -227,30 +257,28 @@ node* NewNode(char *word){
     return n;
 }
 
-/*Insere a palavra word na arvore n. Retorna 0 se não inseriu*/
-int InsertNode(node **n, char *word){
-    if(n==NULL){
-        n = (node**)malloc(sizeof(node*));
-        if(n==NULL) return 0;
-    }
-
-    if(*n==NULL){
-        *n=NewNode(word);
-        if((*n)==NULL) return 0;
-    }
-
-    int ver1 = 0;
-    int ver2 = 0;
-
+/*Insere a palavra word na arvore n*/
+void InsertNode(node **n, char *word){
+    if(n==NULL) n = (node**)malloc(sizeof(node*));
+    if(*n==NULL) *n=NewNode(word);
     else{
         int i=strcmp((*n)->word,word);
         if(!i) (*n)->count++;
-        else if(i>0) ver1 = InsertNode(&(*n)->left,word);
-        else if(i<0) ver2 = InsertNode(&(*n)->right,word);
-    }
+        else if(i>0) InsertNode(&(*n)->left,word);
+        else if(i<0) InsertNode(&(*n)->right,word);
+   }
+}
 
-    if(ver1==0 && ver2==0) return 0;
-    return 1;
+/*Insere todas as palavras de uma tabela de strings em uma árvore
+ * Retorna NULL se não fez a árvore*/
+node* MakeTree(char **table, int nword){
+    if(table==NULL); return NULL;
+    node* tree = NULL;
+    int i;
+    for(i=0; i<nword; i++){
+        InsertNode(&tree, table[i]);
+    }
+    return tree;
 }
 
 /*Imprime a arvore n na tela*/
@@ -354,29 +382,45 @@ char* FirstStrL(char* str, char* divider, int* leng){
 
 
 /* open the archive where the messages are writen and place them on memory */
-void MakeMsg(char *fname){
+/*abre o arquivo de mensagens e coloca na memória
+ * se não conseguiu abrir, ou se houve falta de memória, retorna 1. Se não, retorna 0*/
+int MakeMsg(char *fname){
     FILE *f;
-    char temp[100], temp0='\0';
+    char temp[200], temp0='\0';
     int n, i=0, j;
 
     f=fopen(fname,"r");
-    if(f==NULL) 
-        printf("failure to open the language archive\n the program will not print messages\n");
+    if(f==NULL) {
+        printf("*Failure to open the language archive\n*The program will not print messages\n");
+        return 1;
+    }
     if(f!=NULL){    
         fscanf(f,"%d",&n);
-    
+   
+
         msg=(char**)malloc(sizeof(char*)*n); //global variable
+        if(msg==NULL) return 1;
 
         while(temp0!=EOF){
-            while(temp0!='"') fscanf(f,"%c",&temp0);
+            if(i>n) break;
+            while(temp0!='"'){ 
+                fscanf(f,"%c",&temp0);
+                if(temp0==EOF) break;
+            }
+            if(temp0==EOF) break;
             fscanf(f,"%c",&temp[0]);
-            for(j=1;temp[j-1]!='"';j++)
+            for(j=1;temp[j-1]!='"';j++){
+                if(temp[j-1]==EOF) break;
                 fscanf(f,"%c",&temp[j]);
+            }
+            temp0=temp[j-1];
             temp[j-1]='\0';
             msg[i++]=strdup(temp);
+            if(temp0==EOF) break;
             fscanf(f,"%c",&temp0);
         }
     }
+    return 0;
 }
 
 

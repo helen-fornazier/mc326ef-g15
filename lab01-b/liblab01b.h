@@ -46,6 +46,9 @@ char** Divider(char *str, int *words, char *divider);
  igual a NULL. Retorna NULL se houver erro de memória*/
 char** Divider2(char* str, char* divider, int* nword);
 
+/*Similar a Divider, só que considera como divisor tudo o que não é alfanumérico*/
+char** DividerW(char *str, int *words);
+
 /*Retorna o numero de vezes em que o caractere c aparece em str*/
 int CountChrStr(char* str, char c);
 
@@ -59,8 +62,12 @@ int FindWord(char **table, int words, char *word);
  * libera o que foi alocado e retorna NULL*/
 node* NewNode(char *word);
 
-/*Insere a palavra word na arvore n. Retorna 0 se não inseriu*/
+/*Insere a palavra word na arvore n*/
 void InsertNode(node **n, char *word);
+
+/*Insere todas as palavras de uma tabela de strings em uma árvore
+ * Retorna NULL se não fez a árvore*/
+node* MakeTree(char **table, int nword);
 
 /*Imprime a arvore n na tela*/
 void PrintNode(node *n);
@@ -95,3 +102,9 @@ char* FirstStr(char* str, char* divider);
  * irá retornar é "e" e leng = leng + 1.*/
 char* FirstStrL(char* str, char* divider, int* leng);
 
+/*abre o arquivo de mensagens fname e coloca na memória
+ * se não conseguiu abrir, ou se houve falta de memória, retorna 1. Se não, retorna 0*/
+int MakeMsg(char *fname);
+
+/* imprime a mensagem de número n no arquivo de mensagens carregada por MakeMsg*/
+void Msg(int n);
