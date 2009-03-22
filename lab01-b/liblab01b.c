@@ -7,6 +7,8 @@
 #define SPACE ' '
 #define EOS '\0' /* End Of Sentence  */
 
+char **msg //where will be placed all messages from the program
+
 /*Definicao de palavra: Todo agrupamento formado por caracteres alfanumericos*/
 
 /*Take out signals different from letters or numbers from a string*/
@@ -116,9 +118,10 @@ char** Divider(char *str, int *words, char *divider){
     char **table, *temp, *temp2;
     temp=str;
     
-
     *words=StrCount(str,divider);
     table=(char**)malloc(sizeof(char)*(*words));
+    for(i=0;i<*words;i++) table[i]=NULL;
+
     while(k<*words){
         temp2=strpbrk(temp, divider);
         if(temp2-temp>=sizeof(char)){
@@ -131,7 +134,9 @@ char** Divider(char *str, int *words, char *divider){
         }
         if(temp2==NULL){
             table[k]=strdup(temp);
+            k++;
         }
+        temp+=sizeof(char);
     }
     return table;
 }
@@ -347,4 +352,36 @@ char* FirstStrL(char* str, char* divider, int* leng){
     return strout;
 }
 
+
+/* open the archive where the messages are writen and place them on memory */
+void MakeMsg(char *fname){
+    FILE *f;
+    char temp[100], temp0='\0';
+    int n, i=0, j;
+
+    f=fopen(fname,"r");
+    if(f==NULL) 
+        printf("failure to open the language archive\n the program will not print messages\n");
+    if(f!=NULL){    
+        fscanf(f,"%d",&n);
+    
+        msg=(char**)malloc(sizeof(char*)*n); //global variable
+
+        while(temp0!=EOF){
+            while(temp0!='"') fscanf(f,"%c",&temp0);
+            fscanf(f,"%c",&temp[0]);
+            for(j=1;temp[j-1]!='"';j++)
+                fscanf(f,"%c",&temp[j]);
+            temp[j-1]='\0';
+            msg[i++]=strdup(temp);
+            fscanf(f,"%c",&temp0);
+        }
+    }
+}
+
+
+/* print a message */
+void Msg(int n){
+    if(msg!=NULL) printf("%s\n",msg[n]);
+}
 
