@@ -1,0 +1,2 @@
+Para compilar os arquivos testes, basta digitar na pasta corrente make all.
+Para compilar apenas um deles digite make teste1 ou make teste2.
