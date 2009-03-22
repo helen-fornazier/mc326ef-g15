@@ -36,6 +36,7 @@ char* Corrector(char *str){
     if(str==NULL) return NULL;
 
     int i, spaces=0;
+    if(str[0]==SPACE) spaces++;
     for(i=0;str[i]!=EOS;i++) //Conta os espacos sobrando
         if((str[i]==SPACE&&str[i+1]==SPACE) || (str[i]==SPACE&&str[i+1]==EOS)) spaces++;
 
@@ -117,7 +118,7 @@ int StrCount(char *str, char *divider){
 
 /*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
  e nword sai da função com o número de strings na tabela*/
-char** Divider(char *str, int *words, char *divider){
+char** Divider(char *str, char *divider, int *words){
     int k=0,i;
     char **table, *temp, *temp2;
     temp=str;
@@ -154,7 +155,7 @@ char** Divider2(char* str, char* divider, int* nword){
       return NULL;
   }
   *nword = StrCount(str,divider); //Conta o número de strings
-  if(*nword==0) return NULL;
+ // if(*nword==0) return NULL;
 
   char** table = (char**)malloc(sizeof(char)*(*nword)); //Malloca no tamanho certo
   if(table==NULL) return NULL;
@@ -391,7 +392,7 @@ int MakeMsg(char *fname){
 
     f=fopen(fname,"r");
     if(f==NULL) {
-        printf("*Failure to open the language archive\n*The program will not print messages\n");
+        printf("*Failure to open the language archive\nThe program will not print messages\n");
         return 1;
     }
     if(f!=NULL){    

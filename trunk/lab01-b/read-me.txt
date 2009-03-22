@@ -1,0 +1,13 @@
+ORIENTAÇÃO DE COMPILAÇÃO:
+
+	Para compilar o programa lab01b.c, basta digitar make ou make lab01b.c.
+	Para limpar os objetos e o executável basta digitar make clean.
+	Para fazer os dois basta digitar make all.
+
+COMO ESCOLHER O IDIOMA:
+     Para escolher o idioma basta a execução do programa seja feita da seguinte maneira:
+     ./PROG PARAMETERS LENG.config
+
+     Onde LEGN.config é o nome do arquivo que contém as mensagens no determinado idioma
+     
+     Se não for dado este parâmetro, ele abre como padrão o inglês em eng.config

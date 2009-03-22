@@ -17,37 +17,7 @@ typedef struct node{
 } node;
 
 
-
-/*Substitui caracteres em remove por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes,
- * ou se não houver, retorna uma cópia de str. Retorna NULL se houver falta de memória, ou se foi passado str NULL*/
-char* Cleaner(char *str, char *remove);
-
-/*Substitui muitos espacos seguidos por apenas 1. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes
- * ou uma cópia de str se não houver modificações. Retorna NULL se houver falta de memória*/
-char* Corrector(char *str);
-
-/*Transforma todas as letras minusculas existentes em uma string em maiusculas. Nao modifica a string str. Retorna um ponteiro de uma nova string.
- * Retorna NULL se erro de memória*/
-char* Shifter(char *str);
-
-/*Retorna o numero de palavras alfanuméricos em str*/
-int WordCount(char *str);
-
-/*Conta strings em str, considerando os separadores em accept
- * Ex: str = "Bolo#De #Chocolate Congelado@"  divider = "#@"   
- * o valor retornado é 3 strings entre separadores*/
-int StrCount(char* str, char* divider);
-
-/*Coloca cada palavra da string str em uma posicao diferente da tabela.No final da funcao words recebe o numero de palavras na tabela. Nao modifica a string str. Retorna o apontador da matriz de palavras*/
-char** Divider(char *str, int *words, char *divider);
-
-/*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
- e nword sai da função com o número de strings na tabela. Se str for passado NULL, nword sai igual a 0 e table
- igual a NULL. Retorna NULL se houver erro de memória*/
-char** Divider2(char* str, char* divider, int* nword);
-
-/*Similar a Divider, só que considera como divisor tudo o que não é alfanumérico*/
-char** DividerW(char *str, int *words);
+/**********CONTADORES*****************/
 
 /*Retorna o numero de vezes em que o caractere c aparece em str*/
 int CountChrStr(char* str, char c);
@@ -58,31 +28,26 @@ int CountChrTable(char** table, int nwords, char c);
 /*Retorna o numero de vezes que a palavra word repete na tabela de palavras table. words é o numero de palavras da tabela*/
 int FindWord(char **table, int words, char *word);
 
-/*Cria um nó com uma copia de word e com count 1, se houver algum erro de memória
- * libera o que foi alocado e retorna NULL*/
-node* NewNode(char *word);
+/*Conta strings em str, considerando os separadores em accept
+ * Ex: str = "Bolo#De #Chocolate Congelado@"  divider = "#@"   
+ * o valor retornado é 3 strings entre separadores*/
+int StrCount(char* str, char* divider);
 
-/*Insere a palavra word na arvore n*/
-void InsertNode(node **n, char *word);
+/*Retorna o numero de palavras alfanuméricos em str*/
+int WordCount(char *str);
 
-/*Insere todas as palavras de uma tabela de strings em uma árvore
- * Retorna NULL se não fez a árvore*/
-node* MakeTree(char **table, int nword);
+/*******FIM DE CONTADORES*************/
 
-/*Imprime a arvore n na tela*/
-void PrintNode(node *n);
 
-/*Imprime a arvore n em um arquivo*/
-void PrintNodeF(node *n, FILE* f);
+/******GERADORES DE NOVAS STRINGS********/
 
-/*Imprime uma tabela de strings (table) sendo len o número de strings que ela contém*/
-void PrintTable(char** table, int len);
+/*Substitui caracteres em remove por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes,
+ * ou se não houver, retorna uma cópia de str. Retorna NULL se houver falta de memória, ou se foi passado str NULL*/
+char* Cleaner(char *str, char *remove);
 
-/*Libera tabela de string criada no divider, recebendo o apontador table pra tabela e o numero de palavras que ela contem nword*/
-void FreeT(char** table, int nword);
-
-/*Libera uma árvore com nodes do tipo structure node*/
-void FreeTr(node* tree);
+/*Substitui muitos espacos seguidos por apenas 1. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes
+ * ou uma cópia de str se não houver modificações. Retorna NULL se houver falta de memória*/
+char* Corrector(char *str);
 
 /*Devolve uma cópia da string str cortada até o primeiro caractere que se encontra no divider
   Ex: str = "Bolo#de cholocate#@" divider = "#@"    devolverá a string "Bolo". Se um dos caracteres
@@ -102,9 +67,71 @@ char* FirstStr(char* str, char* divider);
  * irá retornar é "e" e leng = leng + 1.*/
 char* FirstStrL(char* str, char* divider, int* leng);
 
+/*Transforma todas as letras minusculas existentes em uma string em maiusculas. Nao modifica a string str. Retorna um ponteiro de uma nova string.
+ * Retorna NULL se erro de memória*/
+char* Shifter(char *str);
+
+/*******FIM DOS GERADORES DE STRING******/
+
+
+/*******GERADORES DE TABELA DE STRING****/
+
+/*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
+ e nword sai da função com o número de strings na tabela. Se str for passado NULL, nword sai igual a 0 e table
+ igual a NULL. Retorna NULL se houver erro de memória*/
+char** Divider2(char* str, char* divider, int* nword);
+
+/*Similar a Divider, só que considera como divisor tudo o que não é alfanumérico*/
+char** DividerW(char *str, int *words);
+
+/******FIM DOS GERADORES DE STRING******/
+
+
+/*****MANIPULADORES DE STRUCTURE********/
+
+/*Insere a palavra word na arvore n*/
+void InsertNode(node **n, char *word);
+
+/*Cria um nó com uma copia de word e com count 1, se houver algum erro de memória
+ * libera o que foi alocado e retorna NULL*/
+node* NewNode(char *word);
+
+/*****FIM DOS MANIPULADORES DE STRUCTURE******/
+
+
+/***IMPRESSORES***/
+
+/*Imprime a arvore n na tela*/
+void PrintNode(node *n);
+
+/*Imprime a arvore n em um arquivo*/
+void PrintNodeF(node *n, FILE* f);
+
+/*Imprime uma tabela de strings (table) sendo len o número de strings que ela contém*/
+void PrintTable(char** table, int len);
+
+/****FIM DOS IMPRESSORES****/
+
+
+/****LIBERADORES****/
+
+/*Libera tabela de string criada no divider, recebendo o apontador table pra tabela e o numero de palavras que ela contem nword*/
+void FreeT(char** table, int nword);
+
+/*Libera uma árvore com nodes do tipo structure node*/
+void FreeTr(node* tree);
+
+/****FIM DOS LIBERADORES****/
+
+
+
+/****ABERTURA DOS ARQUIVOS DE MENSAGEM****/
+
 /*abre o arquivo de mensagens fname e coloca na memória
  * se não conseguiu abrir, ou se houve falta de memória, retorna 1. Se não, retorna 0*/
 int MakeMsg(char *fname);
 
 /* imprime a mensagem de número n no arquivo de mensagens carregada por MakeMsg*/
 void Msg(int n);
+
+/****FIM DOS MANIPULADORES DOS ARQUIVOS DE MENSAGENS****/
