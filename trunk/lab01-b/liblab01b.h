@@ -18,21 +18,23 @@ typedef struct node{
 
 
 
-
-/*Substitui caracteres em remove por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes*/
+/*Substitui caracteres em remove por espacos. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes,
+ * ou se não houver, retorna uma cópia de str. Retorna NULL se houver falta de memória, ou se foi passado str NULL*/
 char* Cleaner(char *str, char *remove);
 
-/*Substitui muitos espacos seguidos por apenas 1. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes*/
+/*Substitui muitos espacos seguidos por apenas 1. Nao modifica a string str. Retorna um ponteiro de uma nova string com as modificacoes
+ * ou uma cópia de str se não houver modificações. Retorna NULL se houver falta de memória*/
 char* Corrector(char *str);
 
-/*Transforma todas as letras minusculas existentes em uma string em maiusculas. Nao modifica a string str. Retorna um ponteiro de uma nova string.*/
+/*Transforma todas as letras minusculas existentes em uma string em maiusculas. Nao modifica a string str. Retorna um ponteiro de uma nova string.
+ * Retorna NULL se erro de memória*/
 char* Shifter(char *str);
 
-/*Retorna o numero de palavras em str*/
+/*Retorna o numero de palavras alfanuméricos em str*/
 int WordCount(char *str);
 
-/*Conta strings em str, considerando os separadores em divider
- * Ex: str = "@#@Bolo#De #Chocolate Congelado@"  accept = "#@"    
+/*Conta strings em str, considerando os separadores em accept
+ * Ex: str = "Bolo#De #Chocolate Congelado@"  divider = "#@"   
  * o valor retornado é 3 strings entre separadores*/
 int StrCount(char* str, char* divider);
 
@@ -40,7 +42,8 @@ int StrCount(char* str, char* divider);
 char** Divider(char *str, int *words, char *divider);
 
 /*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
- e nword sai da função com o número de strings na tabela*/
+ e nword sai da função com o número de strings na tabela. Se str for passado NULL, nword sai igual a 0 e table
+ igual a NULL. Retorna NULL se houver erro de memória*/
 char** Divider2(char* str, char* divider, int* nword);
 
 /*Retorna o numero de vezes em que o caractere c aparece em str*/
@@ -49,13 +52,14 @@ int CountChrStr(char* str, char c);
 /*Retorna o numero de vezes em que o caractere c aparece na matriz table de strings. nword e a quantidade de palavras presentes na tabela*/
 int CountChrTable(char** table, int nwords, char c);
 
-/*Retorna o numero de vezes que a palavra word repete na tabela de palavras table. words e o numero de palavras da tabela*/
+/*Retorna o numero de vezes que a palavra word repete na tabela de palavras table. words é o numero de palavras da tabela*/
 int FindWord(char **table, int words, char *word);
 
-/*Cria um no com uma copia de word e com count 1*/
+/*Cria um nó com uma copia de word e com count 1, se houver algum erro de memória
+ * libera o que foi alocado e retorna NULL*/
 node* NewNode(char *word);
 
-/*Insere a palavra word na arvore n*/
+/*Insere a palavra word na arvore n. Retorna 0 se não inseriu*/
 void InsertNode(node **n, char *word);
 
 /*Imprime a arvore n na tela*/
