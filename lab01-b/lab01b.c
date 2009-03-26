@@ -9,7 +9,7 @@
 #define SEPARATOR "#"
 #define NSPEC 3
 #define DIVIDER ",;!.?():"
-#define LENGUAGE "Eng"
+#define LENGUAGE "eng.config"
 
 int main(int argc, char* argv[]){
 /***************** error message */
@@ -60,6 +60,8 @@ int main(int argc, char* argv[]){
     }
 
     if(tree==NULL) Msg(9);
+    PrintNodeF(tree,f); //Imprimindo no arquivo
+
     Msg(10);
     printf("=> %d\n", CountChrStr(shift, shiftC[0])); //imprimindo a quantidade de vezes em que c aparece no texto
     Msg(11);
