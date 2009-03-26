@@ -117,36 +117,6 @@ int StrCount(char *str, char *divider){
 
 
 /*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
- e nword sai da função com o número de strings na tabela*/
-char** Divider(char *str, char *divider, int *words){
-    int k=0,i;
-    char **table, *temp, *temp2;
-    temp=str;
-    
-    *words=StrCount(str,divider);
-    table=(char**)malloc(sizeof(char)*(*words));
-    for(i=0;i<*words;i++) table[i]=NULL;
-
-    while(k<*words){
-        temp2=strpbrk(temp, divider);
-        if(temp2-temp>=sizeof(char)){
-            table[k]=(char*)malloc(temp2-temp+1);
-            for(i=0;temp!=temp2;i++){
-                table[k][i]=*temp;
-                temp+=sizeof(char);
-            }
-            k++;
-        }
-        if(temp2==NULL){
-            table[k]=strdup(temp);
-            k++;
-        }
-        temp+=sizeof(char);
-    }
-    return table;
-}
-
-/*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
  e nword sai da função com o número de strings na tabela. Se str for passado NULL, nword sai igual a 0 e table
  igual a NULL. Retorna NULL se houver erro de memória*/
 char** Divider2(char* str, char* divider, int* nword){
@@ -270,17 +240,6 @@ void InsertNode(node **n, char *word){
    }
 }
 
-/*Insere todas as palavras de uma tabela de strings em uma árvore
- * Retorna NULL se não fez a árvore*/
-node* MakeTree(char **table, int nword){
-    if(table==NULL); return NULL;
-    node* tree = NULL;
-    int i;
-    for(i=0; i<nword; i++){
-        InsertNode(&tree, table[i]);
-    }
-    return tree;
-}
 
 /*Imprime a arvore n na tela*/
 void PrintNode(node *n){

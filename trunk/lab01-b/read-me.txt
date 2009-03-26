@@ -11,3 +11,7 @@ COMO ESCOLHER O IDIOMA:
      Onde LEGN.config é o nome do arquivo que contém as mensagens no determinado idioma
      
      Se não for dado este parâmetro, ele abre como padrão o inglês em eng.config
+
+
+FLEXIBILIDADE:
+	Aparentemente o programa é flexivel, pelo menos mais do que o lab01a, pois muitas funções utilizadas foram feitas apartir das do lab anterior, sendo apenas modificadas para funcionar em casos mais abrangentes, trocando valores constantes por variáveis a qual o usuário pode dar os valores. Quanto a flexibilidade do caracter separador, a função recebe um vetor de caracteres que são utilizados como separadores, sendo então bastante flexível.
