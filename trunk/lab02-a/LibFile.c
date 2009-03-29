@@ -1,7 +1,3 @@
-
-#ifndef LIB_FILE
-#define LIB_FILE
-
 #include <stdio.h>
 #include <string.h>
 #include "LibFile.h"
@@ -63,7 +59,6 @@ int SetCursesC(FILE *f, char c, int n){
 }
 
 
-/*reg has been initiate before*/
 
 /*Read of FILE f qnt registers with nfields of lengh iqual to len and put it REGIS reg
  * sum is increased with*/
@@ -76,7 +71,7 @@ int ReadRegFix(FILE *f, REGIS *reg, int *len, int nfields, int qnt){
     char **correct = NULL;
     for(i=0; i<qnt; i++){
         
-        FillFields( f, &(*reg)[i], len, nfields  );  //colocar erro qnd der zero
+        (!FillFields( f, &(*reg)[i], len, nfields ) )   return i;  //colocar erro qnd der zero
 
         correct = CorrectorList( (*reg)[i], nfields );
         if(correct == NULL) return 0;     //imprimir erro
@@ -186,6 +181,3 @@ int PrintStrDiv(FILE *f, char **strList, int len, char *divider){
     return som;
 }
 
-
-
-#endif   /*def LIB_FILE*/
