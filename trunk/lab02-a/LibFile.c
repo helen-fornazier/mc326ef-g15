@@ -9,22 +9,21 @@
 #define EOS '\0'
 #endif   /*def EOS*/
 
-
-/*Matrix to keep the registers*/
-typedef char*** regis_t;
+#define PRINT_TAM 1
+#define PRINT_DIV 0
 
 int Print(FILE *f, char *c){
     /*place error*/
-    return fwrite(&c,sizeof(char),strlen(c),f);
+    return fwrite(c,sizeof(char),strlen(c),f);
 }
 
 int PrintRegister(FILE *f, char **reg, int camp){
     int n=0, i;
     char vet[100], vet2[100];
-    for(i=0;9<camp;i++){
-        sprintf(vet,"%d>%s",(camp+1),reg[camp]);
+    for(i=0;i<camp;i++){
+        sprintf(vet,"%d>%s",(i+1),reg[i]);     
         sprintf(vet2,"<%d><%s",(int)strlen(vet),vet);
-        n+=Print(f,vet);
+        n+=Print(f,vet2);
     }
     return n;
 }
@@ -40,6 +39,22 @@ int PrintAll(FILE *f, int type, char ***reg, int treg, char end, int camp){
     }
     return n;
 }
+
+int SetCursesC(FILE *f, char c, int n){
+    if(feof(f))  return 0;
+    char ch;
+
+    if(fread((void*)(&ch), sizeof(char), 1, f ) != 1)    return 0;
+
+    while(ch != c){
+        if(feof(f))  return 0;
+        if(fread((void*)(&ch), sizeof(char), 1, f ) != 1)    return 0;
+    }
+
+    if(fseek(f, (sizeof(char)*n) -1, SEEK_CUR) != 0) return 0;
+    return 1;
+}
+
 
 /*Initializes and returns a list with nfield NULL fields
  *
@@ -76,7 +91,7 @@ int ReadStr( FILE* f, char **str, int len){
     
     int ver = 0;
     ver = fread( (void*)*str, sizeof(char), len, f );
-    if(ver == len) *str[len] = EOS;
+    if(ver == len) (*str)[len] = EOS;
 
     else{
         (*str)[ver-1] = EOS;  //ver-1 pois se ele não leu o que mandei ler,  quer dizer que ele encontrou o EOF, e se encontrou o EOF, antes dele possui o \n
