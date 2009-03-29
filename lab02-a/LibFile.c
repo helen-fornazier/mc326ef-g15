@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "LibFile.h"
+#include "../pirata.c"
 #ifndef EOS
 #define EOS '\0'
 #endif   /*def EOS*/
