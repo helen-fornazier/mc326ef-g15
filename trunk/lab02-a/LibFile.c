@@ -14,7 +14,7 @@
 #define PRINT_TAM 1
 #define PRINT_DIV 0
 
-typedef (char ***) REGIS;
+typedef char*** REGIS;
 
 int Print(FILE *f, char *c){
     /*place error*/
@@ -32,7 +32,7 @@ int PrintRegister(FILE *f, char **reg, int camp){
     return n;
 }
 
-int PrintAll(FILE *f, int type, char ***reg, int treg, char end, int camp){
+int PrintAll(FILE *f, int type, REGIS reg, int treg, char end, int camp){
     int n=0,i;
     char vet[3];
     sprintf(vet,"%c\n",end);
@@ -43,38 +43,6 @@ int PrintAll(FILE *f, int type, char ***reg, int treg, char end, int camp){
     }
     return n;
 }
-
-/*reg has been initiate before*/
-
-/*Read of FILE f qnt registers with nfields of lengh iqual to len and put it REGIS reg
- * sum is increased with*/
-int ReadRegFix(FILE *f, REGIS *reg, int *len, int nfields, int qnt){
-    (*reg) = (REGIS)malloc( sizeof(char **)*qnt );
-    if((*reg) == NULL)       return 0;
-
-    int i=0;
-
-    char **correct = NULL;
-    for(i=0; i<qnt; i++){
-        
-        FillFields( f, &(*reg)[i], len, nfields  );  //colocar erro qnd der zero
-
-        correct = CorrectList( (*reg)[i], nfields );
-        if(correct == NULL) return 0;     //imprimir erro
-
-        free( (*reg)[i] );
-        (*reg)[i] = correct;
-
-        if(!SetCursesC( f, '\n', 1 ))   break;    //EOF   so break
-
-    }
-    
-    
-    return i;
-}
-
-
-
 
 
 
@@ -93,6 +61,41 @@ int SetCursesC(FILE *f, char c, int n){
     if(feof(f)) return 0;
     return 1;
 }
+
+
+/*reg has been initiate before*/
+
+/*Read of FILE f qnt registers with nfields of lengh iqual to len and put it REGIS reg
+ * sum is increased with*/
+int ReadRegFix(FILE *f, REGIS *reg, int *len, int nfields, int qnt){
+    (*reg) = (REGIS)malloc( sizeof(char **)*qnt );
+    if((*reg) == NULL)       return 0;
+
+    int i=0;
+
+    char **correct = NULL;
+    for(i=0; i<qnt; i++){
+        
+        FillFields( f, &(*reg)[i], len, nfields  );  //colocar erro qnd der zero
+
+        correct = CorrectorList( (*reg)[i], nfields );
+        if(correct == NULL) return 0;     //imprimir erro
+
+        free( (*reg)[i] );
+        (*reg)[i] = correct;
+
+        if(!SetCursesC( f, '\n', 1 ))   break;    //EOF   so break
+
+    }
+    
+    
+    return i;
+}
+
+
+
+
+
 
 
 /*Initializes and returns a list with nfield NULL fields
