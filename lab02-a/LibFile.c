@@ -10,6 +10,9 @@
 #endif   /*def EOS*/
 
 
+/*Matrix to keep the registers*/
+typedef char*** regis_t;
+
 /*Initializes and returns a list with nfield NULL fields
  *
  * Receives the number of fields
@@ -56,29 +59,48 @@ int ReadStr( FILE* f, char **str, int len){
     return ver;
 }
 
-/*Fills the string str with the character c until str to complete len characteres
+/*FALTA COLOCAR UNS AVISOS*/
+/*
+ * f is a FILE the will be readed.
+ * fieldList is a (char **) type that will be filled whith strings.
+ * lenList[i] indicate the number of characteres that will be readed from
+ * f and put in fieldList[i]
  *
- * Returns a new string, it does not modify the original one
- * If it failed in the memory allocation,  returns NULL
- * If len will be lesser or equal str, returns a copy of str
+ * Return the number of all characteres readed
+ * If does not readed the right number of characteres in f, returns 0 
  * */
-char* FillStr(char *str, char c, int len){
-    int i;
+int FillFields(FILE *f, char ***fieldList, int *lenList, int nfields){
+    (*fieldList) = InitRegis(nfields);
+    if(*fieldList == NULL) return 0;
 
-    if((i = strlen(str) ) < len){
-        char *strout = (char *)malloc( sizeof(char)*(len+1) );
-        if (strout == NULL) return NULL;
-
-        strcpy(strout, str);
-        for( ; i<len; i++){
-            strout[i] = c;
-        }
-
-        strout[i] = EOS;
-        return strout;
+    int i=0, sum=0, ver=0;
+    for(i=0; i<nfields; i++){
+        ver = ReadStr(f, (*fieldList)[i], lenList[i]);
+        
+        if( ver<lenList[i] ) return 0;
+        som + = ver;
     }
 
-    else return strdup(str);
+    return som;
 }
+
+/*Prints in the FILE f the list of string (strList with lengh len) separate by the character c
+ *
+ * Returns the number of characteres writed in f*/
+int PrintStrDiv(FILE *f, char **strList, int len, char *divider){
+    int i=0, int som=0;
+
+
+    for(i=0; i<len-1; i++){
+        som+ = Print(f, strList[i]);
+        som+ = Print(f, divider);
+    }
+
+    som+ = Print(f, strList[i]);
+
+    return som;
+}
+
+
 
 #endif   /*def LIB_FILE*/

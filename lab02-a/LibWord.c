@@ -79,6 +79,32 @@ char* Shifter(char *str){
     return strout;
 }
 
+/*Fills the string str with the character c until str to complete len characteres
+ *
+ * Returns a new string, it does not modify the original one
+ * If it failed in the memory allocation,  returns NULL
+ * If len will be lesser or equal str, returns a copy of str
+ * */
+char* FillStr(char *str, char c, int len){
+    int i;
+
+    if((i = strlen(str) ) < len){
+        char *strout = (char *)malloc( sizeof(char)*(len+1) );
+        if (strout == NULL) return NULL;
+
+        strcpy(strout, str);
+        for( ; i<len; i++){
+            strout[i] = c;
+        }
+
+        strout[i] = EOS;
+        return strout;
+    }
+
+    else return strdup(str);
+}
+
+
 /*Retorna o numero de palavras alfanuméricos em str*/
 int WordCount(char *str){
     if(str==NULL) return 0;
@@ -115,6 +141,24 @@ int StrCount(char *str, char *divider){
     return nstr;
 }
 
+/*  Applies in all strins in the list strList with len strings the function 
+ *Corrector described above
+ *
+ *  Returns a new list, does not modified the original one
+ *  If it failed, it returns NULL 
+ *  
+ * */
+char **CorrectorList(char **strList, int len){
+    int i=0;
+    char **strCorrect=NULL;
+    for(i=0; i<len; i++){
+           strCorrect[i] = Corrector(strList[i]);
+           if(strCorrect == NULL) return NULL;
+    }
+    
+    return strCorrect;
+
+}
 
 /*Coloca cada pedaço de str em uma matriz retornada, os caracteres em divider são considerados separadores
  e nword sai da função com o número de strings na tabela. Se str for passado NULL, nword sai igual a 0 e table
