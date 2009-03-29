@@ -49,11 +49,29 @@ char* Cleaner(char *str, char *remove);
  * ou uma cópia de str se não houver modificações. Retorna NULL se houver falta de memória*/
 char* Corrector(char *str);
 
+/*  Applies in all strins in the list strList with len strings the function 
+ *Corrector described above
+ *
+ *  Returns a new list, does not modified the original one
+ *  If it failed, it returns NULL 
+ *  
+ * */
+char **CorrectorList(char **strList, int len);
+
+
 /*Devolve uma cópia da string str cortada até o primeiro caractere que se encontra no divider
   Ex: str = "Bolo#de cholocate#@" divider = "#@"    devolverá a string "Bolo". Se um dos caracteres
   de divider se encontrar na primeira posição, retorna NULL, e se não houver um dos caracteres
   retorna uma cópia de str */
 char* CutStr(char* str, char* divider);
+
+/*Fills the string str with the character c until str to complete len characteres
+ *
+ * Returns a new string, it does not modify the original one
+ * If it failed in the memory allocation,  returns NULL
+ * If len will be lesser or equal str, returns a copy of str
+ * */
+char* FillStr(char *str, char c, int len);
 
 /*Devolve uma cópia da primeira string que aparecer em str limitado pelo caractere em divider,
  pulando os primeiros caracteres:             OBS: Não modifica a string original.
