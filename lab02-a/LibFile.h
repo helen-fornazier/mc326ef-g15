@@ -1,3 +1,6 @@
+#ifndef LIB_FILE
+#define LIB_FILE
+
 #include <stdio.h>
 #include <string.h>
 #include "LibFile.h"
@@ -91,3 +94,5 @@ int FillFields(FILE *f, char ***fieldList, int *lenList, int nfields);
  * Returns the number of characteres writed in f*/
 int PrintStrDiv(FILE *f, char **strList, int len, char *divider);
 
+
+#endif  /*LIB_FILE*/

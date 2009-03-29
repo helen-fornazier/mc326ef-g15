@@ -1,3 +1,6 @@
+#ifndef LIB_WORD
+#define LIB_WORD
+
 #include<string.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -136,6 +139,11 @@ void PrintTable(char** table, int len);
 /*Libera tabela de string criada no divider, recebendo o apontador table pra tabela e o numero de palavras que ela contem nword*/
 void FreeT(char** table, int nword);
 
+/*Libera uma matriz de tabela de string
+ * Recebe a matriz table, a quantidade de listas de strings nregis e a quantidade
+ * de strings em cada lista nword*/
+void FreeTT(char ***table, int nregis, int nword);
+
 /*Libera uma árvore com nodes do tipo structure node*/
 void FreeTr(node* tree);
 
@@ -143,13 +151,5 @@ void FreeTr(node* tree);
 
 
 
-/****ABERTURA DOS ARQUIVOS DE MENSAGEM****/
 
-/*abre o arquivo de mensagens fname e coloca na memória
- * se não conseguiu abrir, ou se houve falta de memória, retorna 1. Se não, retorna 0*/
-int MakeMsg(char *fname);
-
-/* imprime a mensagem de número n no arquivo de mensagens carregada por MakeMsg*/
-void Msg(int n);
-
-/****FIM DOS MANIPULADORES DOS ARQUIVOS DE MENSAGENS****/
+#endif /*LIB_WORD*/
