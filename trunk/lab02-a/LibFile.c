@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "LibFile.h"
-#include "../pirata.c"
 #ifndef EOS
 #define EOS '\0'
 #endif   /*def EOS*/
@@ -13,6 +12,34 @@
 
 /*Matrix to keep the registers*/
 typedef char*** regis_t;
+
+int Print(FILE *f, char *c){
+    /*place error*/
+    return fwrite(&c,sizeof(char),strlen(c),f);
+}
+
+int PrintRegister(FILE *f, char **reg, int camp){
+    int n=0, i;
+    char vet[100], vet2[100];
+    for(i=0;9<camp;i++){
+        sprintf(vet,"%d>%s",(camp+1),reg[camp]);
+        sprintf(vet2,"<%d><%s",(int)strlen(vet),vet);
+        n+=Print(f,vet);
+    }
+    return n;
+}
+
+int PrintAll(FILE *f, int type, char ***reg, int treg, char end, int camp){
+    int n=0,i;
+    char vet[3];
+    sprintf(vet,"%c\n",end);
+    for(i=0;i<treg;i++){
+        if(type) n+=PrintRegister(f,reg[i],camp);
+        else n+=PrintStrDiv(f,reg[i],camp,"|");
+        n+=Print(f,vet);
+    }
+    return n;
+}
 
 /*Initializes and returns a list with nfield NULL fields
  *
@@ -76,28 +103,28 @@ int FillFields(FILE *f, char ***fieldList, int *lenList, int nfields){
 
     int i=0, sum=0, ver=0;
     for(i=0; i<nfields; i++){
-        ver = ReadStr(f, (*fieldList)[i], lenList[i]);
+        ver = ReadStr(f, &((*fieldList)[i]), lenList[i]);
         
         if( ver<lenList[i] ) return 0;
-        som + = ver;
+        sum+= ver;
     }
 
-    return som;
+    return sum;
 }
 
 /*Prints in the FILE f the list of string (strList with lengh len) separate by the character c
  *
  * Returns the number of characteres writed in f*/
 int PrintStrDiv(FILE *f, char **strList, int len, char *divider){
-    int i=0, int som=0;
+    int i=0, som=0;
 
 
     for(i=0; i<len-1; i++){
-        som+ = Print(f, strList[i]);
-        som+ = Print(f, divider);
+        som+= Print(f, strList[i]);
+        som+= Print(f, divider);
     }
 
-    som+ = Print(f, strList[i]);
+    som+= Print(f, strList[i]);
 
     return som;
 }
