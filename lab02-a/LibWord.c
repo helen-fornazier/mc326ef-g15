@@ -1,3 +1,7 @@
+#ifndef LIB_WORD
+#define LIB_WORD
+
+
 #include<string.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -150,7 +154,9 @@ int StrCount(char *str, char *divider){
  * */
 char **CorrectorList(char **strList, int len){
     int i=0;
-    char **strCorrect=NULL;
+    char **strCorrect = (char **)malloc( sizeof(char*)*len);
+    for(i=0; i<len; i++) strCorrect[i] = NULL;
+
     for(i=0; i<len; i++){
            strCorrect[i] = Corrector(strList[i]);
            if(strCorrect == NULL) return NULL;
@@ -432,4 +438,4 @@ int MakeMsg(char *fname){
 void Msg(int n){
     if(msg!=NULL) printf("%s\n",msg[n]);
 }
-
+#endif  /*LIB_WORD*/
