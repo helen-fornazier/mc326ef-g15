@@ -15,7 +15,6 @@
 #define LCURSO 2
 #define LEND 1
 
-typedef char*** REGIS;             //tirar depois e deixar na biblioteca
 
 int main(){
     FILE *f = fopen( ARQ, "r");

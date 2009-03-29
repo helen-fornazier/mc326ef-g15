@@ -10,7 +10,7 @@
 #define PRINT_TAM 1
 #define PRINT_DIV 0
 
-typedef char*** REGIS;
+//typedef char*** REGIS;
 
 int Print(FILE *f, char *c){
     /*place error*/
@@ -53,7 +53,7 @@ int SetCursesC(FILE *f, char c, int n){
         if(fread((void*)(&ch), sizeof(char), 1, f ) != 1)    return 0;
     }
 
-    if(fseek(f, (sizeof(char)*n) -1, SEEK_CUR) != 0) return 0;   //Mudar,  andar um por um
+    if(fseek(f, (sizeof(char)*n) -1, SEEK_CUR) != 0) return 0;
     if(feof(f)) return 0;
     return 1;
 }
@@ -71,7 +71,7 @@ int ReadRegFix(FILE *f, REGIS *reg, int *len, int nfields, int qnt){
     char **correct = NULL;
     for(i=0; i<qnt; i++){
         
-        (!FillFields( f, &(*reg)[i], len, nfields ) )   return i;  //colocar erro qnd der zero
+        if(!FillFields( f, &(*reg)[i], len, nfields ))   return i;
 
         correct = CorrectorList( (*reg)[i], nfields );
         if(correct == NULL) return 0;     //imprimir erro
@@ -132,7 +132,7 @@ int ReadStr( FILE* f, char **str, int len){
 
     else{
         (*str)[ver-1] = EOS;  //ver-1 pois se ele não leu o que mandei ler,  quer dizer que ele encontrou o EOF, e se encontrou o EOF, antes dele possui o \n
-        realloc(*str, sizeof(char)*(ver-1));
+        (*str) = realloc(*str, sizeof(char)*(ver-1));
         if(*str == NULL) return 0;
     }
 
