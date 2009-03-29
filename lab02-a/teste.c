@@ -15,6 +15,8 @@
 #define LCURSO 2
 #define LEND 1
 
+typedef char*** REGIS;             //tirar depois e deixar na biblioteca
+
 int main(){
     FILE *f = fopen( ARQ, "r");
     int i = 0, ver = 0;
@@ -32,21 +34,27 @@ int main(){
    char **regList = InitRegis(NFIELDS);
 
 */
-
+    FILE *fw = fopen("out.txt", "w");
+    char *divider = "|"; 
+    REGIS reg = NULL;
     int Len[10] = {LRA, LNOME, LCIDADE, LTELRES, LTELALT, LSEXO, LCURSO, LEND};
+    /*
     char **List = NULL;
+
     FillFields(f, &List, Len, NFIELDS);
     char **ListCorrect = CorrectorList(List, NFIELDS);
 
-    FILE *fw = fopen("out.txt", "w");
-    char *divider = "|"; 
-    PrintStrDiv(fw, ListCorrect, NFIELDS, divider);
+       PrintStrDiv(fw, ListCorrect, NFIELDS, divider);
 
     SetCursesC(f, '\n', 1);
 
     FillFields(f, &List, Len, NFIELDS);
     ListCorrect = CorrectorList(List, NFIELDS);
     PrintStrDiv(fw, ListCorrect, NFIELDS, divider);
+    */
 
+    ReadRegFix(f, &reg, Len, NFIELDS-1, 2);
+
+    PrintAll( fw, 1, reg, 2, '#', NFIELDS-1 );     
     return 0;
 }
