@@ -1,26 +1,17 @@
 CFLAGS = -Wall -c -g
 CC = gcc
-TEST = teste
+PROG = lab02a
 OBJS = LibWord.o LibFile.o lab02a.o LibMsg.o
+LIBS = LibWord.c LibFile.c LibMsg.c
 
-$(TEST):LibWord.c LibFile.c teste.c LibMsg.c
-	$(CC) $(CFLAGS) LibWord.c
-	$(CC) $(CFLAGS) LibFile.c
-	$(CC) $(CFLAGS) teste.c
-	$(CC) $(CFLAGS) LibMsg.c
-	$(CC) $(OBJS) -ansi -o $(TEST)
-
-lab02a:LibWord.c LibFile.c lab02a.c LibMsg.c
-	$(CC) $(CFLAGS) LibWord.c
-	$(CC) $(CFLAGS) LibFile.c
+$(PROG): $(LIBS) lab02a.c
+	$(CC) $(CFLAGS) $(LIBS)
 	$(CC) $(CFLAGS) lab02a.c
-	$(CC) $(CFLAGS) LibMsg.c
-	$(CC) $(OBJS) -o lab02a
+	$(CC) $(OBJS) -o $(PROG)
 
 clean:
-	rm *.o $(TEST)
+	rm *.o $(PROG)
 
 all:
 	make clean
-	make $(TEST)
-	
+	make $(PROG)
