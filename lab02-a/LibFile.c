@@ -29,13 +29,15 @@ int PrintRegister(FILE *f, char **reg, int camp){
     return n;
 }
 
-int PrintAll(FILE *f, int type, REGIS reg, int treg, char end, int camp){
+int PrintAll(FILE *f, int type, REGIS reg, int treg, int camp){
     int n=0,i;
     char vet[3];
-    sprintf(vet,"%c\n",end);
+   // sprintf(vet,"%c\n",end);
     for(i=0;i<treg;i++){
-        if(type) n+=PrintRegister(f,reg[i],camp);
-        else n+=PrintStrDiv(f,reg[i],camp,"|");
+
+        sprintf(vet, "%s\n", reg[i][camp-1]);
+        if(type) n+=PrintRegister(f,reg[i],camp-1);
+        else n+=PrintStrDiv(f,reg[i],camp-1,"|");
         n+=Print(f,vet);
     }
     return n;
