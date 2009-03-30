@@ -14,6 +14,8 @@
 #define FS7 2
 #define FS8 1
 
+#define OBLIST {1, 1, 0, 0, 0, 0, 1, 1}
+
 #define PIN 1
 #define POUT1 2
 #define POUT2 3
@@ -35,13 +37,25 @@ int main(int argc, char *argv[]){
 	if(fo1==NULL) Msg(3);
 	FILE *fo2=fopen(argv[POUT2],"w");
 	if(fo2==NULL) Msg(4);
+
 	int fieldsize[NFIELDS]={FS1,FS2,FS3,FS4,FS5,FS6,FS7, FS8};
+    int oblist[NFIELDS] = OBLIST;
 	REGIS matrix;
-	int i=5, j=0;
+	int i=5, j=0, k=0, y=0;
 	int n1=0, n2=0;
 	
 	while(i==5){
 		i=ReadRegFix(fi,&matrix,fieldsize,NFIELDS,5);
+        
+        for(y=i-1; y>=0; y--){
+            for(k=0; k<NFIELDS; k++){
+                if((oblist[k] == 1) && (matrix[y][k][0] == EOS)){
+                    Msg(12);
+                    printf("%d, %d\n", j+y+1 , k+1);
+                }
+            }
+        }
+
 		j+=i;
 		n1+=PrintAll(fo1,PRINT_DIV,matrix,i,NFIELDS);
 		n2+=PrintAll(fo2,PRINT_TAM,matrix,i,NFIELDS);
