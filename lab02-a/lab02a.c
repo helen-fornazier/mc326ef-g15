@@ -14,7 +14,9 @@
 
 int main(int argc, char *argv[]){
 		
-	MakeMsg("english.config");
+	if(argc==3){
+		if(!MakeMsg(argv[2])) MakeMsg(english.config);
+	} else MakeMsg(english.config);
 	
 	if(argc!=2){ 
 		Msg(1);
@@ -41,6 +43,8 @@ int main(int argc, char *argv[]){
         FreeTT(matrix, i, NFIELDS); 
 	}
 
+        Msg(11);
+	printf("%d\n",j*(FS1+FS2+FS3+FS4+FS5+FS6+FS7+FS8+1));	
 	Msg(8);
 	printf("%d\n",j);
 	Msg(9);
