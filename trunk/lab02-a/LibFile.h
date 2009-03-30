@@ -15,6 +15,15 @@
 
 typedef char*** REGIS;
 
+/* Take from a file information about the registers 
+f-> the file that contains the information in this format:
+number of fields, size of each field, obligatory information
+tab-> adress of the matrix that will containd the size of the fields and it's obligatoriety
+nfields-> adres of an int where will be place the number of fields that the registers have
+
+*/
+void MakeData(FILE *f, int ***tab, int *nfields);
+
 /*Description:  Prints the string c in file f
  *
  * Returns the number of characteres writed

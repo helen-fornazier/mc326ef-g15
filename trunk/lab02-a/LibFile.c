@@ -12,6 +12,19 @@
 
 //typedef char*** REGIS;
 
+void MakeData(FILE *f, int ***tab, int *nfields){
+	fscanf(f,"%d",nfields);
+	*tab=(int**)malloc(sizeof(int*)*2);
+	(*tab)[0]=(int*)malloc(sizeof(int)*(*nfields));
+	(*tab)[1]=(int*)malloc(sizeof(int)*(*nfields));
+
+	int i;
+	for(i=0;i<*nfields;i++)
+		fscanf(f,"%d",&((*tab)[0][i]));
+	for(i=0;i<*nfields;i++)
+		fscanf(f,"%d",&((*tab)[1][i]));
+}
+
 int Print(FILE *f, char *c){
     return fwrite(c,sizeof(char),strlen(c),f);
 }
