@@ -31,3 +31,5 @@ código reutilizável
 
 
 Obs: Os contadores de caracteres contam até mesmo caracteres especiais como \n
+
+Obs: No final de cada registro do arquivo de entrada, deve haver obrigatoriamente um campo com exato um caracter
