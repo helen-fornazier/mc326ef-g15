@@ -37,9 +37,10 @@ int main(int argc, char *argv[]){
 	if(fo1==NULL) Msg(3);
 	FILE *fo2=fopen(argv[POUT2],"w");
 	if(fo2==NULL) Msg(4);
-
-	int fieldsize[NFIELDS]={FS1,FS2,FS3,FS4,FS5,FS6,FS7, FS8};
-    int oblist[NFIELDS] = OBLIST;
+    
+    //RECEBER NFIELD
+	int fieldsize[NFIELDS]={FS1,FS2,FS3,FS4,FS5,FS6,FS7, FS8}; //COLOCAR AQUI A LISTA DOS TAMANHO DOS CAMPOS
+    int oblist[NFIELDS] = OBLIST;    //COLOCAR AQUI A LISTA DE OBRIGATORIEDADE
 	REGIS matrix;
 	int i=5, j=0, k=0, y=0;
 	int n1=0, n2=0;
@@ -47,7 +48,7 @@ int main(int argc, char *argv[]){
 	while(i==5){
 		i=ReadRegFix(fi,&matrix,fieldsize,NFIELDS,5);
         
-        for(y=i-1; y>=0; y--){
+        for(y=0; y<i; y++){
             for(k=0; k<NFIELDS; k++){
                 if((oblist[k] == 1) && (matrix[y][k][0] == EOS)){
                     Msg(12);
