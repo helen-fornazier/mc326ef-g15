@@ -2,6 +2,8 @@
 #include"LibMsg.h"
 #include"LibWord.h"
 
+#define IDIOM "english.config"
+
 #define NFIELDS 8
 #define FS1 7
 #define FS2 24
@@ -12,22 +14,26 @@
 #define FS7 2
 #define FS8 1
 
+#define PIN 1
+#define POUT1 2
+#define POUT2 3
+#define PLENG 4
 int main(int argc, char *argv[]){
 		
-	if(argc==3){
-		if(!MakeMsg(argv[2])) MakeMsg("english.config");
-	} else MakeMsg("english.config");
+	if(argc==PLENG+1){
+		if(MakeMsg(argv[PLENG])!=0) MakeMsg(IDIOM);
+	} else MakeMsg(IDIOM);
 	
-	if(argc!=2){ 
+	if(argc<PLENG || argc> PLENG+1){ 
 		Msg(1);
 		return 1;
 	}
 
-	FILE *fi=fopen(argv[1],"r");
+	FILE *fi=fopen(argv[PIN],"r");
 	if(fi==NULL) Msg(2); 
-	FILE *fo1=fopen("out1.txt","w");
+	FILE *fo1=fopen(argv[POUT1],"w");
 	if(fo1==NULL) Msg(3);
-	FILE *fo2=fopen("out2.txt","w");
+	FILE *fo2=fopen(argv[POUT2],"w");
 	if(fo2==NULL) Msg(4);
 	int fieldsize[NFIELDS]={FS1,FS2,FS3,FS4,FS5,FS6,FS7, FS8};
 	REGIS matrix;
