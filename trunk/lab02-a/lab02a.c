@@ -15,8 +15,8 @@
 int main(int argc, char *argv[]){
 		
 	if(argc==3){
-		if(!MakeMsg(argv[2])) MakeMsg(english.config);
-	} else MakeMsg(english.config);
+		if(!MakeMsg(argv[2])) MakeMsg("english.config");
+	} else MakeMsg("english.config");
 	
 	if(argc!=2){ 
 		Msg(1);
