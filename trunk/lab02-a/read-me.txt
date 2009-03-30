@@ -1,0 +1,29 @@
+**Fabricado no ambiente Linux
+
+Instruçõe de compilação:
+	  Para compilar o programa basta digitar make
+
+Instruções de execução:
+	   Para executar o programa basta digitar:
+	   	./lab02a <arq_entrada> <arq_saida1> <arq_saida2> <linguagem>
+
+	   O arquivo de linguagem é opcional, por padrão as mensagens serão
+dadas em inglês.
+
+
+      	   O pacote já vem incluso os arquivos de linguagem english.config e 
+portugues.config
+
+
+
+
+
+
+  Este programa possui bastante flexibilidade em suas funções, tornando seu 
+código reutilizável
+
+
+
+
+
+Obs: Os contadores de caracteres contam até mesmo caracteres especiais como \n

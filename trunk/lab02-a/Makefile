@@ -10,7 +10,8 @@ $(PROG): $(LIBS) lab02a.c
 	$(CC) $(OBJS) -o $(PROG)
 
 clean:
-	rm *.o $(PROG)
+	rm *.o
+	rm $(PROG)
 
 all:
 	make clean
