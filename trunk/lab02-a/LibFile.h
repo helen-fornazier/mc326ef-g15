@@ -38,7 +38,7 @@ int PrintRegister(FILE *f, char **reg, int camp);
  *          PRINT_TAM   model of the PrintRegister function:  <7><1>Helen<9><2>Pedro T#
  *          PRINT_DIV   model of the PrintStrDiv function:    Helen|Pedro T#
  *          */
-int PrintAll(FILE *f, int type, REGIS reg, int treg, char end, int camp);
+int PrintAll(FILE *f, int type, REGIS reg, int treg, int camp);
 
 /*Description: Find the character c in file f (from current cursor)
  * and set the cursor n chararacteres after c

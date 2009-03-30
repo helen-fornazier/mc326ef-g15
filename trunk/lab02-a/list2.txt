@@ -1,9 +1,9 @@
-071121 HELEN HER               POA            37564321 98967671 F 42#
+071121 HELEN HER               POA            37564321 98967671 F 42@
 073326 LeandRo vendramin       ARAPOTI        44312343          M 42#
-082593 Andre Oliveira          Acre           74837624            12#
+082593 Andre Oliveira          Acre           74837624            12$
 095732 Ana Maria DUarte                                         F 23#
-037468 Daniel Vieira           Rio de Janeiro          93848832 M 54#
-071592 Alex Santos                            37483921 98883716 M 32#
+037468 Daniel Vieira           Rio de Janeiro          93848832 M 54*
+071592 Alex Santos                            37483921 98883716 M 32B
 019234 Iara Vasconcelos BenedicArapongal Sao P37281072 98888880 F 43#
 085923 Vanessa Mae             Cinga Pura                       F 09#
 067384 Julio Cesar             Brasilia                91111132 M 10#
@@ -17,4 +17,4 @@
 077777 Claudia Raia                                    23232322 F 17#
 012323 Carmen Miranda          Brasilia                         F 97#
 048293 Sand Saraf              Poorcity                         F 69#
-036462 Hiro Nakamura           japão                              42#
+036462 Hiro Nakamura           japao                              42#
