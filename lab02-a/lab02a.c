@@ -3,18 +3,8 @@
 #include"LibWord.h"
 
 #define IDIOM "english.config"
+#define DATA "data.config"
 
-#define NFIELDS 8
-#define FS1 7
-#define FS2 24
-#define FS3 15
-#define FS4 9
-#define FS5 9
-#define FS6 2
-#define FS7 2
-#define FS8 1
-
-#define OBLIST {1, 1, 0, 0, 0, 0, 1, 1}
 
 #define PIN 1
 #define POUT1 2
@@ -38,19 +28,22 @@ int main(int argc, char *argv[]){
 	FILE *fo2=fopen(argv[POUT2],"w");
 	if(fo2==NULL) Msg(4);
     
-    //RECEBER NFIELD
-	int fieldsize[NFIELDS]={FS1,FS2,FS3,FS4,FS5,FS6,FS7, FS8}; //COLOCAR AQUI A LISTA DOS TAMANHO DOS CAMPOS
-    int oblist[NFIELDS] = OBLIST;    //COLOCAR AQUI A LISTA DE OBRIGATORIEDADE
+	int **tab, nfields;
+	FILE *fd=fopen(DATA,"r");
+	MakeData(fd,&tab,&nfields);
+	fclose(fd);
+
+
 	REGIS matrix;
 	int i=5, j=0, k=0, y=0;
 	int n1=0, n2=0;
 	
 	while(i==5){
-		i=ReadRegFix(fi,&matrix,fieldsize,NFIELDS,5);
+		i=ReadRegFix(fi,&matrix,tab[0],nfields,5);
         
         for(y=0; y<i; y++){
-            for(k=0; k<NFIELDS; k++){
-                if((oblist[k] == 1) && (matrix[y][k][0] == EOS)){
+            for(k=0; k<nfields; k++){
+                if((tab[1][k] == 1) && (matrix[y][k][0] == EOS)){
                     Msg(12);
                     printf("%d, %d\n", j+y+1 , k+1);
                 }
@@ -58,14 +51,17 @@ int main(int argc, char *argv[]){
         }
 
 		j+=i;
-		n1+=PrintAll(fo1,PRINT_DIV,matrix,i,NFIELDS);
-		n2+=PrintAll(fo2,PRINT_TAM,matrix,i,NFIELDS);
+		n1+=PrintAll(fo1,PRINT_DIV,matrix,i,nfields);
+		n2+=PrintAll(fo2,PRINT_TAM,matrix,i,nfields);
 
-        FreeTT(matrix, i, NFIELDS); 
+        FreeTT(matrix, i, nfields); 
 	}
-
+	
+	int sum=0;
+	for(i=0;i<nfields;i++)
+		sum+=tab[0][i];
         Msg(11);
-	printf("%d\n",j*(FS1+FS2+FS3+FS4+FS5+FS6+FS7+FS8+1));	
+	printf("%d\n",j*(sum+1));	
 	Msg(8);
 	printf("%d\n",j);
 	Msg(9);

@@ -15,7 +15,11 @@ dadas em inglês.
 portugues.config
 
 
-
+	   O programa abre o arquivo data.config onde estão armazenadas informacões
+sobre a quantidade de campos, obrigatoriedade dos mesmos e seus tamanhos. Neste
+arquivo, o primeiro número é a quantidade de campos que tem em um registro, na
+segunda linha, temos o tamanho de cada campo, ordenadamente, e na terceira linha
+a obrigatoriedade dos campos (também ordenados).
 
 
 
