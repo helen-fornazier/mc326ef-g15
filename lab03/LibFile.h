@@ -14,13 +14,34 @@
 
 typedef char*** REGIS;
 
-/* Take from a file information about the registers 
-f-> the file that contains the information in this format:
-number of fields, size of each field, obligatory information
-tab-> adress of the matrix that will containd the size of the fields and it's obligatoriety
-nfields-> adres of an int where will be place the number of fields that the registers have
+#define FIX 1
+#define VAR 0
 
-*/
+typedef struct datastyle{
+	int nfield;			//how many field exist
+	int *efield;		//lengh of each field
+	int *ob;			//list of oblibatoriety
+	char *fieldname;	//name of each fields
+
+}	DATASTYLE;
+
+typedef struct regis{
+	int nregis;		//number of registers
+	int fix;		//if is a file with fixed lenght filds, fix == 1, if isn't,  fix == 0
+	int nrem;		//the number of registers set as removed
+	DATASTYLE *datastyle;		//if a file of variable lenght fields, datastyle is NULL
+	FILE* fi;		//a pointer to the beginning of the file
+	FILE* fe;		//a pointer to the last register
+
+} REGIS_t;
+
+
+/* Take from a file information about the registers 
+ * f-> the file that contains the information in this format:
+ * number of fields, size of each field, obligatory information
+ * tab-> adress of the matrix that will containd the size of the fields and it's obligatoriety
+ * nfields-> adres of an int where will be place the number of fields that the registers have
+ */
 void MakeData(FILE *f, int ***tab, int *nfields);
 
 /*Description:  Prints the string c in file f
