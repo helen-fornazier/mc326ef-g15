@@ -1,31 +1,41 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include"LibWord.h"
 
+typedef struct error{
+	char **msg;   //where will be placed all messages from the program
+	int n;
+} EFILE;
 
-char **msg; //where will be placed all messages from the program
+//char **msg;
+
 
 /* open the archive where the messages are writen and place them on memory */
 /*abre o arquivo de mensagens e coloca na memória
- * se não conseguiu abrir, ou se houve falta de memória, retorna 1. Se não, retorna 0*/
-int MakeMsg(char *fname){
+ * se não conseguiu abrir, ou se houve falta de memória, retorna NULL. Se não, retorna um apontador
+ * para EFILE*/
+
+EFILE* MakeMsg(char *fname){
     FILE *f;
     char temp[200], temp0='\0';
-    int n, i=0, j;
+    int i=0, j;
+	EFILE *e = (EFILE*)malloc( sizeof(EFILE) );
+	if(e==NULL)	return NULL;
 
     f=fopen(fname,"r");
     if(f==NULL) {
         printf("*Failure to open the language archive\nThe program will not print messages\n");
-        return 1;
+        return NULL;
     }
     if(f!=NULL){    
-        fscanf(f,"%d",&n);
+        fscanf(f,"%d",&(e->n));
    
 
-        msg=(char**)malloc(sizeof(char*)*n); //global variable
-        if(msg==NULL) return 1;
+        (e->msg)=(char**)malloc(sizeof(char*)*(e->n)); //global variable
+        if(e->msg==NULL) return NULL;
 
         while(temp0!=EOF){
-            if(i>n) break;
+            if(i>e->n) break;
             while(temp0!='"'){ 
                 fscanf(f,"%c",&temp0);
                 if(temp0==EOF) break;
@@ -38,17 +48,21 @@ int MakeMsg(char *fname){
             }
             temp0=temp[j-1];
             temp[j-1]='\0';
-            msg[i++]=strdup(temp);
+            (e->msg)[i++]=strdup(temp);
             if(temp0==EOF) break;
             fscanf(f,"%c",&temp0);
         }
     }
-    return 0;
+    return e;
 }
 
 
 /* print a message */
-void Msg(int n){
-    if(msg!=NULL) printf("%s\n",msg[n]);
+void Msg(EFILE* e, int n){
+    if(e->msg!=NULL) printf("%s\n",e->msg[n]);
 }
 
+void CloseMsg(EFILE *e){
+	FreeT(e->msg, e->n + 1);
+	free(e);
+}
