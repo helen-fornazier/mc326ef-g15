@@ -7,24 +7,65 @@
 #include"LibFile.h"
 #include"LibMsg.h"
 
-#define IDIOM "english.config"
+#define IDIOM "portugues.config" //MUDAR
 
-void PrintMenu(){
-	printf("Opcão 1:  Conversão do arquivo de formato fixo para formato variável\n");	
-	printf("Opcão 2:  Listar o arquivo de dados no formato fixo\n");	
-	printf("Opcão 3:  Listar o arquivo de dados no formato variável\n");	
-	printf("Opcão 4:  Pesquisa de um determinado registro pela chave primária\n");	
-	printf("Opcão 6:  Extração das chaves\n");	
-	printf("Opcão 7:  Classificação do arquivo  das chaves\n");	
-	printf("\n");	
-}
+void PrintMenu(EFILE *e){
+	Msg( e, 0);
+	Msg( e, 1);
+	Msg( e, 2);
+	Msg( e, 3);
+	Msg( e, 4);
+	Msg( e, 5);
+	Msg( e, 6);
+	}
+
+void Option1(){}
+void Option2(){}
+void Option3(){}
+void Option4(){}
+void Option6(){}
+void Option7(){}
+void Option8(){}
+void Option9(){}
+void Option10(){}
+void Option11(){}
+void Option12(){}
 
 int main(int argc, char *argv[]){
-	//PrintMenu();
 	EFILE *e;
-	e = MakeMsg(IDIOM);
-	Msg(e, 12);
-	CloseMsg(e);
+	int op=1;
 
+	if(argc == 2)	e = MakeMsg(argv[1]);	
+	else	e = MakeMsg(IDIOM);
+
+	PrintMenu(e);
+
+	while(op!=0){
+		Msg( e, 8);
+		scanf("%d", &op);
+	
+		switch(op){
+		case 1:
+			Option1();	break;
+		case 2:
+			Option2();	break;
+		case 3:
+			Option3();	break;
+		case 4:
+			Option4();	break;
+		case 6:
+			Option6();	break;
+		case 7:
+			Option7();	break;
+		case 13:
+			op = 0;		break;
+		default:
+			Msg(e, 7);
+		}
+	}
+
+
+
+	CloseMsg(e);
 	return 0;
 }

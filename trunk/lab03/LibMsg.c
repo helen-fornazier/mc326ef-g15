@@ -31,7 +31,7 @@ EFILE* MakeMsg(char *fname){
         fscanf(f,"%d",&(e->n));
    
 
-        (e->msg)=(char**)malloc(sizeof(char*)*(e->n)); //global variable
+        (e->msg)=(char**)malloc(sizeof(char*)*(e->n + 1)); 
         if(e->msg==NULL) return NULL;
 
         while(temp0!=EOF){
@@ -53,6 +53,7 @@ EFILE* MakeMsg(char *fname){
             fscanf(f,"%c",&temp0);
         }
     }
+	fclose(f);
     return e;
 }
 

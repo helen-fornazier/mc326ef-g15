@@ -1,4 +1,4 @@
-CFLAGS = -Wall -c -g
+CFLAGS = -Wall -c -g -O1
 CC = gcc
 OBJS = LibWord.o LibFile.o LibMsg.o
 LIBS = LibWord.c LibFile.c LibMsg.c
@@ -16,7 +16,7 @@ htest: $(LIBS) $(OBJS) htest.o htest.c
 lab03: $(LIBS) $(OBJS) lab03.o lab03.c
 	$(CC) $(CFLAGS) $(LIBS)
 	$(CC) $(CFLAGS) lab03.c
-	$(CC) $(OBJS) lab03.o -o lab03
+	$(CC) -o lab03 lab03.o $(OBJS)
 
 
 clean:
@@ -30,3 +30,6 @@ all:
 	make ptest
 	make htest
 	make lab03
+
+valgrind:
+	valgrind --tool=memcheck --leak-check=yes --leak-check=full --show-reachable=yes ./lab03
