@@ -21,7 +21,7 @@ typedef struct datastyle{
 	int nfield;			//how many field exist
 	int *efield;		//lengh of each field
 	int *ob;			//list of oblibatoriety
-	char *fieldname;	//name of each fields
+	char **fieldname;	//name of each fields
 
 }	DATASTYLE;
 

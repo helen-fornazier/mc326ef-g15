@@ -143,6 +143,11 @@ char **InitRegis(int nfield){
 int ReadStr( FILE* f, char **str, int len){
     *str = (char*)malloc( sizeof(char)*( len+1 ) );
     if( *str==NULL ) return 0;
+
+	if(len == 0){   //não tenho certeza se ele devolve cooloca null sem isso
+		*str = NULL;
+		return 0;
+	}
     
     int ver = 0;
     ver = fread( (void*)*str, sizeof(char), len, f );

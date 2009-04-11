@@ -106,9 +106,95 @@ void Option1(EFILE *e, DATASTYLE *data){
 }
 
 
-void Option2(){}
-void Option3(){}
-void Option4(){}
+void Option2(EFILE *e, DATASTYLE *data){
+	char in[100];
+	FILE *fi;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	char **str = NULL;
+	int i = 0;
+
+	while(1){
+		if(!ReadRegFix2(fi, &str, data->efield, data->nfield)) break;
+		for(i=0; i<data->nfield -1 ; i++){
+			printf("%s = %s |", data->fieldname[i], str[i]);
+		}
+		printf("%s = %s\n", data->fieldname[i], str[i]);
+		free(str);
+	}
+
+
+
+}
+
+void Option3(EFILE *e, DATASTYLE *data){
+	char in[100];
+	FILE *fi;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	char **str = NULL;
+	
+//	ReadRegVar(fi, &str, data->nfield);
+	int i=0;
+	while(1){
+		if(!ReadRegVar(fi, &str, data->nfield)) break;
+		for(i=0; i<data->nfield -1 ; i++){
+			printf("%s = %s |", data->fieldname[i], str[i]);
+		}
+		printf("%s = %s\n", data->fieldname[i], str[i]);
+		free(str);
+	}
+
+}
+
+void Option4(EFILE *e, DATASTYLE *data){
+	char in[100];
+	FILE *fi;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+	
+	int i=0;
+	char **str;
+	char key[100];
+	Msg( e, 13);
+	scanf("%s", key);
+
+
+	if(SearchKeyVar(fi, key)){
+		if(!ReadRegVar(fi, &str, data->nfield)){
+			Msg(e, 14);
+			return;
+		}
+		
+		for(i=0; i<data->nfield -1 ; i++){
+			printf("%s = %s |", data->fieldname[i], str[i]);
+		}
+		printf("%s = %s\n", data->fieldname[i], str[i]);
+		free(str);
+	}
+	else Msg( e, 15);
+}
+
 void Option6(){}
 void Option7(){}
 void Option8(){}
@@ -136,6 +222,7 @@ int main(int argc, char *argv[]){
 	PrintMenu(e);
 
 	while(op!=0){
+		printf("\n");
 		Msg( e, 8);
 		scanf("%d", &op);
 	
@@ -143,11 +230,11 @@ int main(int argc, char *argv[]){
 		case 1:
 			Option1(e, data);	break;
 		case 2:
-			Option2();	break;
+			Option2(e, data);	break;
 		case 3:
-			Option3();	break;
+			Option3(e, data);	break;
 		case 4:
-			Option4();	break;
+			Option4(e, data);	break;
 		case 6:
 			Option6();	break;
 		case 7:
