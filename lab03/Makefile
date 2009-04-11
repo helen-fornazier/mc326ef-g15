@@ -1,4 +1,4 @@
-CFLAGS = -Wall -c -g -O1
+CFLAGS = -Wall -c -g
 CC = gcc
 OBJS = LibWord.o LibFile.o LibMsg.o
 LIBS = LibWord.c LibFile.c LibMsg.c

@@ -74,7 +74,33 @@ void Option1(EFILE *e, DATASTYLE *data){  //TEM UM MAIS OTIMIZADO NO MEU TESTE .
 }
 
 
-void Option2(){}
+void Option2(EFILE *e, DATASTYLE *data){
+	char in[100];
+	FILE *fi;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	char **str = NULL;
+	int i = 0;
+
+	while(1){
+		if(!ReadRegFix2(fi, &str, data->efield, data->nfield)) break;
+		for(i=0; i<data->nfield -1 ; i++){
+			printf("%s = %s |", data->fieldname[i], str[i]);
+		}
+		printf("%s = %s\n", data->fieldname[i], str[i]);
+		free(str);
+	}
+}
+
+
+
 void Option3(){}
 void Option4(){}
 void Option6(){}
@@ -105,7 +131,7 @@ int main(int argc, char *argv[]){
 		case 1:
 			Option1(e, data);	break;
 		case 2:
-			Option2();	break;
+			Option2(e, data);	break;
 		case 3:
 			Option3();	break;
 		case 4:
