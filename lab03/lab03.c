@@ -1,5 +1,3 @@
-/*Colocar o programa*/
-
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
@@ -9,7 +7,6 @@
 
 #define IDIOM "portugues.config" //MUDAR
 #define DATA "data.config"
-
 
 void PrintMenu(EFILE *e){
 	Msg( e, 0);
@@ -29,12 +26,30 @@ void VerOb(EFILE *e, DATASTYLE *data, REGIS matrix,  int i, int j){
 			if((data->ob[k] == 1) && (matrix[y][k][0] == EOS)){
 				Msg(e, 12);
 				printf("%d, %d\n", j+y+1 , k+1);
+				exit(1);
 			}
 		}
 	}
 }
 
-void Option1(EFILE *e, DATASTYLE *data){  //TEM UM MAIS OTIMIZADO NO MEU TESTE ..
+/*Verifica a obrigatoriedade de um registro*/
+void VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i){
+		int k=0;
+	
+		for(k=0; k<data->nfield; k++){
+
+			if((data->ob[k] == 1) && (str[k][0] == EOS)){
+				Msg(e, 12);
+				printf("%d, %d\n", i+1 , k+1);
+			}
+		}
+}
+
+
+
+
+
+void Option1(EFILE *e, DATASTYLE *data){
 	char in[100];
 	char out[100];
 	FILE *fi, *fo1;
@@ -56,21 +71,22 @@ void Option1(EFILE *e, DATASTYLE *data){  //TEM UM MAIS OTIMIZADO NO MEU TESTE .
 		return;
 	}
 
-	REGIS matrix;
-	int i=5, j=0;
-	int n1=0, n2=0;
+	//-----------------
 	
-	while(i==5){
-		i=ReadRegFix(fi,&matrix,data->efield,data->nfield,5);
-		        
-		VerOb(e, data, matrix, i, j);
-      		
-		j+=i;
-//		n1+=PrintAll(fo1,PRINT_DIV,matrix,i,data->nfield);
-		n2+=PrintAll(fo1,PRINT_TAM,matrix,i,data->nfield);
-
-        FreeTT(matrix, i, data->nfield); 
+	
+	char **str = NULL;
+	int i = 0;
+	for(i=0; ; i++){
+		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
+		VerOb1(e, data, str, i);
+		if(str[0][0] == 's'){
+			PrintAll(fo1,PRINT_TAM,&str,1,data->nfield);	
+		}
+		FreeT(str, data->nfield);
 	}
+
+	fclose(fi);
+	fclose(fo1);
 }
 
 
@@ -91,18 +107,87 @@ void Option2(EFILE *e, DATASTYLE *data){
 
 	while(1){
 		if(!ReadRegFix2(fi, &str, data->efield, data->nfield)) break;
-		for(i=0; i<data->nfield -1 ; i++){
+		
+		if(str[0][0] == 's'){
+			for(i=1; i<data->nfield -1 ; i++){
+				printf("%s = %s |", data->fieldname[i], str[i]);
+			}
+			printf("%s = %s\n", data->fieldname[i], str[i]);
+		}
+		FreeT(str, data->nfield);
+	}
+	
+	fclose(fi);
+
+}
+
+void Option3(EFILE *e, DATASTYLE *data){
+	char in[100];
+	FILE *fi;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	char **str = NULL;
+	
+//	ReadRegVar(fi, &str, data->nfield);
+	int i=0;
+	while(1){
+		if(!ReadRegVar(fi, &str, data->nfield)) break;
+
+		if(str[0][0] == 's'){
+			for(i=1; i<data->nfield -1 ; i++){
+				printf("%s = %s |", data->fieldname[i], str[i]);
+			}
+			printf("%s = %s\n", data->fieldname[i], str[i]);
+		}
+
+		FreeT(str, data->nfield);
+	}
+	fclose(fi);
+}
+
+void Option4(EFILE *e, DATASTYLE *data){
+	char in[100];
+	FILE *fi;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+	
+	int i=0;
+	char **str;
+	char key[100];
+	Msg( e, 13);
+	scanf("%s", key);
+
+
+	if(SearchKeyVar(fi, key)){
+		if(!ReadRegVar(fi, &str, data->nfield)){
+			Msg(e, 14);
+			return;
+		}
+		
+		for(i=1; i<data->nfield -1 ; i++){
 			printf("%s = %s |", data->fieldname[i], str[i]);
 		}
 		printf("%s = %s\n", data->fieldname[i], str[i]);
-		free(str);
+		FreeT(str, data->nfield);
 	}
+	else Msg( e, 15);
+
+	fclose(fi);
 }
 
-
-
-void Option3(){}
-void Option4(){}
 void Option6(){}
 void Option7(){}
 void Option8(){}
@@ -111,19 +196,27 @@ void Option10(){}
 void Option11(){}
 void Option12(){}
 
+
 int main(int argc, char *argv[]){
 	EFILE *e;
-	int op=1;
-
 	if(argc == 2)	e = MakeMsg(argv[1]);	
 	else	e = MakeMsg(IDIOM);
 
-	FILE *fd = fopen(DATA, "r");		//file of configuration
-	DATASTYLE *data = FillData(fd);		//liberar no final
+	int op=1;
+
+	FILE *f = fopen(DATA, "r");		//file of configuration
+	
+	DATASTYLE *data = FillData(f);
+	fclose(f);
+
+	printf("NFIELDS %d\n", data->nfield);
+
+
 
 	PrintMenu(e);
 
 	while(op!=0){
+		printf("\n");
 		Msg( e, 8);
 		scanf("%d", &op);
 	
@@ -133,9 +226,9 @@ int main(int argc, char *argv[]){
 		case 2:
 			Option2(e, data);	break;
 		case 3:
-			Option3();	break;
+			Option3(e, data);	break;
 		case 4:
-			Option4();	break;
+			Option4(e, data);	break;
 		case 6:
 			Option6();	break;
 		case 7:
@@ -148,7 +241,8 @@ int main(int argc, char *argv[]){
 	}
 
 
-
+	CloseDatastyle(data);
 	CloseMsg(e);
+
 	return 0;
 }

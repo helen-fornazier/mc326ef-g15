@@ -33,3 +33,7 @@ all:
 
 valgrind:
 	valgrind --tool=memcheck --leak-check=yes --leak-check=full --show-reachable=yes ./lab03
+
+valgrindh:
+	valgrind --tool=memcheck --leak-check=yes --leak-check=full --show-reachable=yes ./htest
+
