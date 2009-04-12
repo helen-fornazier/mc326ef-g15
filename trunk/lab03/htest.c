@@ -72,37 +72,22 @@ void Option1(EFILE *e, DATASTYLE *data){
 		return;
 	}
 
-	//TESTE-----------------
+	//-----------------
 	
 	
 	char **str = NULL;
 	int i = 0;
 	for(i=0; ; i++){
-		if(!ReadRegFix1(fi, &str, data->efield, data->nfield)) break;
+		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
 		VerOb1(e, data, str, i);
-		PrintAll(fo1,PRINT_TAM,&str,1,data->nfield);	
-		free(str);
+		if(str[0][0] == 's'){
+			PrintAll(fo1,PRINT_TAM,&str,1,data->nfield);	
+		}
+		FreeT(str, data->nfield);
 	}
 
-	//FIM TESTE----------
-/*
-	REGIS matrix;
-	int i=5, j=0;
-	int n1=0, n2=0;
-	
-	while(i==5){
-		i=ReadRegFix(fi,&matrix,data->efield,data->nfield,5);
-		        
-		VerOb(e, data, matrix, i, j);
-      		
-		j+=i;
-//		n1+=PrintAll(fo1,PRINT_DIV,matrix,i,data->nfield);
-		n2+=PrintAll(fo1,PRINT_TAM,matrix,i,data->nfield);
-
-        FreeTT(matrix, i, data->nfield); 
-	}
-*/
-
+	fclose(fi);
+	fclose(fo1);
 }
 
 
@@ -123,14 +108,17 @@ void Option2(EFILE *e, DATASTYLE *data){
 
 	while(1){
 		if(!ReadRegFix2(fi, &str, data->efield, data->nfield)) break;
-		for(i=0; i<data->nfield -1 ; i++){
-			printf("%s = %s |", data->fieldname[i], str[i]);
+		
+		if(str[0][0] == 's'){
+			for(i=1; i<data->nfield -1 ; i++){
+				printf("%s = %s |", data->fieldname[i], str[i]);
+			}
+			printf("%s = %s\n", data->fieldname[i], str[i]);
 		}
-		printf("%s = %s\n", data->fieldname[i], str[i]);
-		free(str);
+		FreeT(str, data->nfield);
 	}
-
-
+	
+	fclose(fi);
 
 }
 
@@ -152,13 +140,17 @@ void Option3(EFILE *e, DATASTYLE *data){
 	int i=0;
 	while(1){
 		if(!ReadRegVar(fi, &str, data->nfield)) break;
-		for(i=0; i<data->nfield -1 ; i++){
-			printf("%s = %s |", data->fieldname[i], str[i]);
-		}
-		printf("%s = %s\n", data->fieldname[i], str[i]);
-		free(str);
-	}
 
+		if(str[0][0] == 's'){
+			for(i=1; i<data->nfield -1 ; i++){
+				printf("%s = %s |", data->fieldname[i], str[i]);
+			}
+			printf("%s = %s\n", data->fieldname[i], str[i]);
+		}
+
+		FreeT(str, data->nfield);
+	}
+	fclose(fi);
 }
 
 void Option4(EFILE *e, DATASTYLE *data){
@@ -186,13 +178,15 @@ void Option4(EFILE *e, DATASTYLE *data){
 			return;
 		}
 		
-		for(i=0; i<data->nfield -1 ; i++){
+		for(i=1; i<data->nfield -1 ; i++){
 			printf("%s = %s |", data->fieldname[i], str[i]);
 		}
 		printf("%s = %s\n", data->fieldname[i], str[i]);
-		free(str);
+		FreeT(str, data->nfield);
 	}
 	else Msg( e, 15);
+
+	fclose(fi);
 }
 
 void Option6(){}
@@ -214,6 +208,7 @@ int main(int argc, char *argv[]){
 	FILE *f = fopen(DATA, "r");		//file of configuration
 	
 	DATASTYLE *data = FillData(f);
+	fclose(f);
 
 	printf("NFIELDS %d\n", data->nfield);
 
@@ -247,7 +242,7 @@ int main(int argc, char *argv[]){
 	}
 
 
-
+	CloseDatastyle(data);
 	CloseMsg(e);
 
 	return 0;

@@ -123,5 +123,70 @@ int FillFields(FILE *f, char ***fieldList, int *lenList, int nfields);
  * Returns the number of characteres writed in f*/
 int PrintStrDiv(FILE *f, char **strList, int len, char *divider);
 
+/*Description: Return a struct DATASTYLE alreary initialized*/
+DATASTYLE *InitDatastyle();
+
+/*Description: Ready the configuration file and fills 
+ * a struct DATASTYLE and returns it
+ *
+ * fields readed:	
+ * 		int nfields
+ * 		int nfield;			
+ *		int *efield;		
+ *		int *ob;			
+ *		char *fieldname;		
+ *	*/
+DATASTYLE* FillData(FILE* f);
+
+/*Description: Free all data of a struct DATASTYLE data*/
+void CloseDatastyle(DATASTYLE *data);
+
+/*Read a fixed register, aplies Corrector and set the
+ * cursor f after \n
+ *
+ * f is the file tha will read
+ * str is a table that will contain the data of one register
+ * str doesn't need to be inicialized
+ * len is the vector of lenght of each field
+ * nfield is the number of fields
+ *
+ * return 0 if faild or finded EOS
+ * */
+int ReadRegFix3(FILE *f, char ***str, int *len, int nfields);
+
+/*Read a fixed register without aplies Corrector and set the
+ * cursor f after \n
+ *
+ * f is the file tha will read
+ * str is a table that will contain the data of one register
+ * str doesn't need to be inicialized
+ * len is the vector of lenght of each field
+ * nfield is the number of fields
+ *
+ * return 0 if faild or finded EOS
+ * */
+int ReadRegFix2(FILE *f, char ***str, int *len, int nfields);
+
+/*Description: Reads a file f whth variable format and puts
+ * in str
+ *
+ * =>f is the file thar will be readed
+ * =>***str is the addres of char **str, doesn't need to be inicialized
+ * =>nfields is the number of fields in str
+ *
+ * Return 0 if failed, 1 if not.
+ */
+//só funciona se o último campo antes do caracter for obrigatório
+int ReadRegVar(FILE *f, char ***str,int nfields);
+
+/*retorna 1 se encontrou, e deixa f setado no começo do registro encontrado
+ * se não, f fica no começo*/
+
+/*Description: Returns 1 if finded key in the principal key
+ * return 0 if doesn't finded*/
+int SearchKeyVar(FILE *f, char *key);
+
+
+
 
 #endif  /*LIB_FILE*/

@@ -31,12 +31,13 @@ int Print(FILE *f, char *c){
     return fwrite(c,sizeof(char),strlen(c),f);
 }
 
+/*Mudei para imprimir o campo zero -- voltei*/
 int PrintRegister(FILE *f, char **reg, int camp){
     int n=0, i;
     char vet[100], vet2[100];
     for(i=0;i<camp;i++){
         if(reg[i][0]!='\0'){
-	   sprintf(vet,"%d>%s",(i+1),reg[i]);     
+	   	   sprintf(vet,"%d>%s",(i+1),reg[i]);     
            sprintf(vet2,"<%d><%s",(int)strlen(vet),vet);
            n+=Print(f,vet2);
         }
@@ -155,7 +156,7 @@ int ReadStr( FILE* f, char **str, int len){
 
     else{
         (*str)[ver-1] = EOS;  //ver-1 pois se ele não leu o que mandei ler,  quer dizer que ele encontrou o EOF, e se encontrou o EOF, antes dele possui o \n
-        (*str) = realloc(*str, sizeof(char)*(ver-1));
+        (*str) = realloc(*str, sizeof(char)*(ver));
         if(*str == NULL) return 0;
     }
 
@@ -180,7 +181,11 @@ int FillFields(FILE *f, char ***fieldList, int *lenList, int nfields){
     for(i=0; i<nfields; i++){
         ver = ReadStr(f, &((*fieldList)[i]), lenList[i]);
         
-        if( ver<lenList[i] ) return 0;
+        if( ver<lenList[i] ){
+			FreeT((*fieldList), i+1);
+			return 0;
+		}
+
         sum+= ver;
     }
 
