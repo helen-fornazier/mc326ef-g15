@@ -189,8 +189,142 @@ void Option4(EFILE *e, DATASTYLE *data){
 	fclose(fi);
 }
 
-void Option6(){}
-void Option7(){}
+void Option6(EFILE *e, DATASTYLE *data){
+	char in[100];
+	char out[100];
+	FILE *fi, *fo1;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	Msg( e, 10);
+	scanf("%s", out);
+	fo1 = fopen(out, "w");
+	if(fo1==NULL){
+		Msg( e, 11);
+		fclose(fi);
+		return;
+	}
+
+	//-----------------
+
+	long int addres = 0;
+	char *str = NULL;
+	char *ex = NULL;
+	int tam=0, n=0;
+	int tam2=0;
+
+
+	
+	while(1){
+
+		addres = ftell(fi);
+
+		if(!SetCursesC( fi, '<', 1)){
+			fclose(fi);
+			fclose(fo1);
+			return;
+		}
+		fscanf(fi, "%d", &tam);
+	
+		if(!SetCursesC( fi, '<', 1)){
+			fclose(fi);
+			fclose(fo1);
+			return;
+		}
+		fscanf(fi, "%d", &n);
+
+		if(!SetCursesC( fi, '>', 1)){
+			fclose(fi);
+			fclose(fo1);
+			return;
+		}
+ 
+
+		ReadStr(fi, &(ex), tam-2);
+
+		if(!SetCursesC( fi, '<', 1)){
+			free(ex);
+			fclose(fi);
+			fclose(fo1);
+			return;
+		}
+ 
+		fscanf(fi, "%d", &tam2);
+	
+		if(!SetCursesC( fi, '<', 1)){
+			free(ex);
+			fclose(fi);
+			fclose(fo1);
+			return;
+		}
+ 
+		fscanf(fi, "%d", &n);
+
+		if(!SetCursesC( fi, '>', 1)){
+			free(ex);
+			fclose(fi);
+			fclose(fo1);
+			return;
+		}
+ 
+
+		ReadStr(fi, &(str), tam2-2);
+		
+		if(ex[0] == 's'){
+			fprintf(fo1, "%s ", str);
+			fprintf(fo1, "%ld\n", addres);
+
+		}
+		
+
+		free(ex);
+		free(str);
+
+		if(!SetCursesC( fi, '\n', 1)){
+			fclose(fi);
+			fclose(fo1);
+			return;
+		}
+ 
+
+	}
+
+	fclose(fi);
+	fclose(fo1);
+
+}
+
+void Option7(EFILE *e, DATASTYLE *data){
+	char in[100];
+	char out[100];
+	char sys[30];
+
+	Msg( e, 9);
+	scanf("%s", in);
+
+	Msg( e, 10);
+	scanf("%s", out);
+
+	if(strcmp(in,out)!=0){
+		sprintf(sys, "sort -d %s > %s", in, out);
+		system(sys);
+	}
+
+	else{
+		sprintf(sys, "sort -d %s > temp.txt", in);
+		system(sys);
+		sprintf(sys, "mv temp.txt %s", in);
+		system(sys);
+	}
+}
+
+
 void Option8(){}
 void Option9(){}
 void Option10(){}
@@ -231,9 +365,9 @@ int main(int argc, char *argv[]){
 		case 4:
 			Option4(e, data);	break;
 		case 6:
-			Option6();	break;
+			Option6(e, data);	break;
 		case 7:
-			Option7();	break;
+			Option7(e, data);	break;
 		case 13:
 			op = 0;		break;
 		default:

@@ -2,8 +2,6 @@
 #include <string.h>
 #include "LibFile.h"
 #include "LibWord.h"
-#include "plib.c"		//Não esquecer de tirar no final do programa
-#include "hlib.c"
 
 #ifndef EOS
 #define EOS '\0'
@@ -209,3 +207,226 @@ int PrintStrDiv(FILE *f, char **strList, int len, char *divider){
     return som;
 }
 
+/*Description: Return a struct DATASTYLE alreary initialized*/
+DATASTYLE *InitDatastyle(){
+	DATASTYLE *data = (DATASTYLE*) malloc( sizeof(DATASTYLE) );
+	if( data==NULL )	return NULL;
+	
+
+	data->nfield = 0;
+	data->efield = NULL;
+	data->ob = NULL;
+	data->fieldname = NULL;
+	
+	return data;
+
+}
+
+/*Description: Ready the configuration file and fills 
+ * a struct DATASTYLE and returns it
+ *
+ * fields readed:	
+ * 		int nfields
+ * 		int nfield;			
+ *		int *efield;		
+ *		int *ob;			
+ *		char *fieldname;		
+ *	*/
+DATASTYLE* FillData(FILE* f){
+	int i, j;
+
+	if(f==NULL)		return NULL;
+
+	DATASTYLE *data = InitDatastyle();
+	if(data == NULL)	return NULL;
+
+	int **table;
+	MakeData(f, &table, &(data->nfield));
+	
+	data->efield = table[0];
+	data->ob = table[1];
+	free(table);
+
+	data->fieldname = (char**) malloc (sizeof(char*) * data->nfield );
+	if(data->fieldname == NULL ){
+		free(data->efield);
+		free(data->ob);
+		return NULL;
+	}
+
+	/*ARRUMAR ESTE PEDAÇO*/
+	
+	for(i=0; i<data->nfield; i++){
+		data->fieldname[i] = (char*) malloc( sizeof(char) * 200 );
+	}
+
+	for(i=0; i<data->nfield; i++){
+			SetCursesC(f, '"', 1);	
+		for(j=0; ; j++){
+
+			fscanf(f, "%c", &(data->fieldname[i][j]));
+
+			if(data->fieldname[i][j] == '"' || data->fieldname[i][j] == EOF ){
+				data->fieldname[i][j] = EOS;
+				break;
+			}
+		}
+	}
+
+	return data;
+}
+
+
+/*Description: Free all data of a struct DATASTYLE data*/
+void CloseDatastyle(DATASTYLE *data){
+	free(data->efield);
+	free(data->ob);
+	FreeT(data->fieldname, data->nfield);
+	free(data);
+}
+
+
+/*Read a fixed register, aplies Corrector and set the
+ * cursor f after \n
+ *
+ * f is the file tha will read
+ * str is a table that will contain the data of one register
+ * str doesn't need to be inicialized
+ * len is the vector of lenght of each field
+ * nfield is the number of fields
+ *
+ * return 0 if faild or finded EOS
+ * */
+int ReadRegFix3(FILE *f, char ***str, int *len, int nfields){
+	if(!ReadRegFix2(f, str, len, nfields))	return 0;
+
+	char **correct = NULL;
+    correct = CorrectorList( (*str), nfields );
+	
+	FreeT((*str), nfields);
+
+	(*str) = correct;
+
+	return 1;
+}
+
+/*Read a fixed register without aplies Corrector and set the
+ * cursor f after \n
+ *
+ * f is the file tha will read
+ * str is a table that will contain the data of one register
+ * str doesn't need to be inicialized
+ * len is the vector of lenght of each field
+ * nfield is the number of fields
+ *
+ * return 0 if faild or finded EOS
+ * */
+int ReadRegFix2(FILE *f, char ***str, int *len, int nfields){
+		char **string = NULL;
+
+		if(!FillFields( f, &string, len, nfields ))   return 0;
+
+        if(!SetCursesC( f, '\n', 1 ))   return 0;    //EOF  
+	
+        (*str) = string;
+
+		return 1;
+}
+
+
+/*Description: Reads a file f whth variable format and puts
+ * in str
+ *
+ * =>f is the file thar will be readed
+ * =>***str is the addres of char **str, doesn't need to be inicialized
+ * =>nfields is the number of fields in str
+ *
+ * Return 0 if failed, 1 if not.
+ */
+//só funciona se o último campo antes do caracter for obrigatório
+int ReadRegVar(FILE *f, char ***str,int nfields){
+	int tam=0,  n=0, i=0;
+	(*str) = (char**) malloc( sizeof(char*)*nfields);
+
+	while(n<nfields-1){
+		if(!SetCursesC( f, '<', 1)){
+			FreeT((*str), n);	
+			return 0;
+		}
+		fscanf(f, "%d", &tam);
+
+
+		if(!SetCursesC( f, '<', 1)){
+			FreeT((*str), n);	
+			return 0;
+		}
+		fscanf(f, "%d", &n);
+
+		if(!SetCursesC( f, '>', 1)){
+			FreeT((*str), n);	
+			return 0;
+		}
+ 	
+
+		for(; i<n; i++){                          
+			(*str)[i] = (char*) malloc(sizeof(char));
+			(*str)[i][0] = EOS;
+		}
+		
+		free((*str)[n-1]);
+		ReadStr(f, &( (*str)[n-1] ), tam-2);            //MUDAR DE N-1 PARA N SE O CAMPO 0 FOR A FLAG
+	}
+
+	ReadStr(f, &( (*str)[n] ), 1); //caracter separador
+	//if(fseek(f, (sizeof(char)*2), SEEK_CUR) != 0) return 0; //anda dois
+	return 1;
+}
+
+
+/*retorna 1 se encontrou, e deixa f setado no começo do registro encontrado
+ * se não, f fica no começo*/
+
+/*Description: Returns 1 if finded key in the principal key
+ * return 0 if doesn't finded*/
+int SearchKeyVar(FILE *f, char *key){
+	int tam=0, n=0;
+	int tam2=0;
+	char *str = NULL;
+	char *ex = NULL;
+	while(1){
+		
+		if(!SetCursesC( f, '<', 1))		return 0;
+		fscanf(f, "%d", &tam);
+	
+		if(!SetCursesC( f, '<', 1))		return 0;  //TRATAR ERRO COM N==0
+		fscanf(f, "%d", &n);
+
+		if(!SetCursesC( f, '>', 1))		return 0;
+
+		ReadStr(f, &(ex), tam-2);
+
+		if(!SetCursesC( f, '<', 1))		return 0;
+		fscanf(f, "%d", &tam2);
+	
+		if(!SetCursesC( f, '<', 1))		return 0;  //TRATAR ERRO COM N==0
+		fscanf(f, "%d", &n);
+
+		if(!SetCursesC( f, '>', 1))		return 0;
+
+		ReadStr(f, &(str), tam2-2);
+
+
+		if(strcmp(key,str) == 0 && ex[0] == 's'){
+			if(fseek(f, (-1)* (sizeof(char)*(tam+tam2 + 8)), SEEK_CUR) != 0) return 0;		//volta pro começo do registro
+			free(ex);
+			free(str);
+			return 1;
+		}
+		
+		free(ex);
+		free(str);
+
+		if(!SetCursesC( f, '\n', 1))	return 0;
+
+	}
+}
