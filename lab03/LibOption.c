@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<ctype.h>
 #include"LibWord.h"
 #include"LibFile.h"
 #include"LibMsg.h"
@@ -42,7 +43,34 @@ void VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i){
 		}
 }
 
+void VerAl(EFILE *e, DATASTYLE *data, char **str,  int i){
+		int k=0, ver=0;
+	
+		for(k=0; k<data->nfield; k++){
+			if(str[k][0] == EOS)	continue;
 
+			ver = VerAlnum(str[k]);
+			if(ver==1 && data->alpha[k]==2){
+				Msg(e, 16);
+				printf("%d, %d\n", i+1 , k+1);
+			}
+
+			if(ver==2 && data->alpha[k]==1){
+				Msg(e, 16);
+				printf("%d, %d\n", i+1 , k+1);
+			}
+			
+			if(ver==0 && data->alpha[k]!=0){
+				Msg(e, 16);
+				printf("%d, %d\n", i+1 , k+1);
+			}
+			if(ver==3 && data->alpha[k]!=3){
+				Msg(e, 16);
+				printf("%d, %d\n", i+1 , k+1);
+			}
+ 
+		}
+}
 
 
 
@@ -76,6 +104,7 @@ void Option1(EFILE *e, DATASTYLE *data){
 	for(i=0; ; i++){
 		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
 		VerOb1(e, data, str, i);
+		VerAl(e, data, str, i);
 		if(str[0][0] == 's'){
 			PrintAll(fo1,PRINT_TAM,&str,1,data->nfield);	
 		}
@@ -168,7 +197,7 @@ void Option4(EFILE *e, DATASTYLE *data){
 	scanf("%s", key);
 
 
-	if(SearchKeyVar(fi, key)){
+	if(SearchKeyVar(fi, key,data->nfield)){
 		if(!ReadRegVar(fi, &str, data->nfield)){
 			Msg(e, 14);
 			return;
@@ -185,6 +214,47 @@ void Option4(EFILE *e, DATASTYLE *data){
 	fclose(fi);
 }
 
+void Option6(EFILE *e, DATASTYLE *data){
+	char in[100];
+	char out[100];
+	FILE *fi, *fo1;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	Msg( e, 10);
+	scanf("%s", out);
+	fo1 = fopen(out, "w");
+	if(fo1==NULL){
+		Msg( e, 11);
+		fclose(fi);
+		return;
+	}
+
+	//-----------------
+
+	long int start;
+	char **vet;
+
+	while((start=ReadRegVar(fi,&vet,data->nfield))){
+		if(vet[0][0]=='s'){
+			fprintf(fo1,"%s ",vet[1]);
+			fprintf(fo1,"%ld\n",start);
+		}
+		FreeT(vet,data->nfield);
+	}
+
+
+	fclose(fi);
+	fclose(fo1);
+}
+
+/*************************************************
 void Option6(EFILE *e, DATASTYLE *data){
 	char in[100];
 	char out[100];
@@ -295,6 +365,7 @@ void Option6(EFILE *e, DATASTYLE *data){
 	fclose(fo1);
 
 }
+*****************************************************/
 
 void Option7(EFILE *e, DATASTYLE *data){
 	char in[100];

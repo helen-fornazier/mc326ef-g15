@@ -22,6 +22,7 @@ typedef struct datastyle{
 	int *efield;		//lengh of each field
 	int *ob;			//list of oblibatoriety
 	char **fieldname;	//name of each fields
+	int *alpha;			//1=num, 2=alph, 3=aphnum, 0=none
 
 }	DATASTYLE;
 
@@ -42,7 +43,7 @@ typedef struct regis{
  * tab-> adress of the matrix that will containd the size of the fields and it's obligatoriety
  * nfields-> adres of an int where will be place the number of fields that the registers have
  */
-void MakeData(FILE *f, int ***tab, int *nfields);
+void MakeData(FILE *f, int **tab, int *nfields);
 
 /*Description:  Prints the string c in file f
  *
@@ -177,14 +178,15 @@ int ReadRegFix2(FILE *f, char ***str, int *len, int nfields);
  * Return 0 if failed, 1 if not.
  */
 //só funciona se o último campo antes do caracter for obrigatório
-int ReadRegVar(FILE *f, char ***str,int nfields);
+//int ReadRegVar(FILE *f, char ***str,int nfields);
+long int ReadRegVar(FILE *f, char ***reg, int fields);
 
 /*retorna 1 se encontrou, e deixa f setado no começo do registro encontrado
  * se não, f fica no começo*/
 
 /*Description: Returns 1 if finded key in the principal key
  * return 0 if doesn't finded*/
-int SearchKeyVar(FILE *f, char *key);
+int SearchKeyVar(FILE *f, char *key, int nfields);
 
 
 

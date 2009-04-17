@@ -12,24 +12,24 @@
 
 //typedef char*** REGIS;
 
-void MakeData(FILE *f, int ***tab, int *nfields){
-	fscanf(f,"%d",nfields);
-	*tab=(int**)malloc(sizeof(int*)*2);
-	(*tab)[0]=(int*)malloc(sizeof(int)*(*nfields));
-	(*tab)[1]=(int*)malloc(sizeof(int)*(*nfields));
+void MakeData(FILE *f, int **tab, int *nfields){
+	//*tab=(int**)malloc(sizeof(int*)*2);
+	(*tab)=(int*)malloc(sizeof(int)*(*nfields));
+	//(*tab)[1]=(int*)malloc(sizeof(int)*(*nfields));
 
 	int i;
 	for(i=0;i<*nfields;i++)
-		fscanf(f,"%d",&((*tab)[0][i]));
-	for(i=0;i<*nfields;i++)
-		fscanf(f,"%d",&((*tab)[1][i]));
+		fscanf(f,"%d",&((*tab)[i]));
+//	for(i=0;i<*nfields;i++)
+//		fscanf(f,"%d",&((*tab)[1][i]));
 }
 
 int Print(FILE *f, char *c){
     return fwrite(c,sizeof(char),strlen(c),f);
 }
 
-/*Mudei para imprimir o campo zero -- voltei*/
+/**********************************************
+ * Mudei para imprimir o campo zero -- voltei
 int PrintRegister(FILE *f, char **reg, int camp){
     int n=0, i;
     char vet[100], vet2[100];
@@ -41,6 +41,25 @@ int PrintRegister(FILE *f, char **reg, int camp){
         }
     }
     return n;
+}
+*************************************************/
+
+int PrintRegister(FILE *f,char **reg, int nfields){
+	int i, n;
+	n=0;
+	char vet[100];
+	
+	for(i=0;i<nfields;i++)
+		if(*reg[i]!='\0'){		
+			vet[0]=strlen(reg[i])+2;
+			vet[1]=i+1;
+			sprintf(vet+2,"%s",reg[i]);
+
+			fprintf(f,"%s",vet);
+
+			n+=strlen(reg[i])+2;
+		}
+	return n;
 }
 
 int PrintAll(FILE *f, int type, REGIS reg, int treg, int camp){
@@ -56,8 +75,6 @@ int PrintAll(FILE *f, int type, REGIS reg, int treg, int camp){
     }
     return n;
 }
-
-
 
 int SetCursesC(FILE *f, char c, int n){
     if(feof(f))  return 0;
@@ -239,13 +256,15 @@ DATASTYLE* FillData(FILE* f){
 
 	DATASTYLE *data = InitDatastyle();
 	if(data == NULL)	return NULL;
-
-	int **table;
-	MakeData(f, &table, &(data->nfield));
+	fscanf(f,"%d", &(data->nfield));
 	
-	data->efield = table[0];
-	data->ob = table[1];
-	free(table);
+	//int **table;
+	MakeData(f, &(data->efield), &(data->nfield));
+	MakeData(f, &(data->ob), &(data->nfield));
+	
+//	data->efield = table[0];
+//	data->ob = table[1];
+//	free(table);
 
 	data->fieldname = (char**) malloc (sizeof(char*) * data->nfield );
 	if(data->fieldname == NULL ){
@@ -272,6 +291,9 @@ DATASTYLE* FillData(FILE* f){
 			}
 		}
 	}
+
+
+	MakeData(f, &(data->alpha), &(data->nfield));
 
 	return data;
 }
@@ -342,7 +364,8 @@ int ReadRegFix2(FILE *f, char ***str, int *len, int nfields){
  * =>nfields is the number of fields in str
  *
  * Return 0 if failed, 1 if not.
- */
+ *
+
 //só funciona se o último campo antes do caracter for obrigatório
 int ReadRegVar(FILE *f, char ***str,int nfields){
 	int tam=0,  n=0, i=0;
@@ -381,13 +404,82 @@ int ReadRegVar(FILE *f, char ***str,int nfields){
 	//if(fseek(f, (sizeof(char)*2), SEEK_CUR) != 0) return 0; //anda dois
 	return 1;
 }
+**********************************************************************************************************/
+
+
+int ReadField(FILE *f, char **vet){
+	int size, field;
+	unsigned char temp;
+	
+	if(feof(f)) return 0;
+	fscanf(f,"%c",&temp);
+	size=temp;
+	if(feof(f)) return 0;
+	fscanf(f,"%c",&temp);
+	field=temp;
+	
+	if(ReadStr(f,vet,size-2)<size-2){ 
+		free(*vet);
+		return 0;
+	}
+
+	return field;
+}
+
+long int ReadRegVar(FILE *f, char ***reg, int fields){
+	int n, i=1;
+	char *vet;
+	long int start=ftell(f);
+
+	(*reg)=(char**)malloc(sizeof(char*)*fields);
+	while(1){
+		n=ReadField(f,&vet);
+
+		if(n==0){ 		
+			FreeT(*reg,i-1);
+			return 0;
+		}
+
+		if(n>fields) printf("number of fields in file is greater than expected \n");
+		for(;i<n;i++){
+			(*reg)[i-1]=(char*)malloc(sizeof(char));
+			(*reg)[i-1][0]='\0';
+		}
+		(*reg)[i-1]=strdup(vet);
+		free(vet);
+		i++;
+		
+		if(n==fields-1) break;
+	}
+
+	ReadStr(f,&(*reg)[n],1);
+	
+	SetCursesC(f,'\n',1);
+
+	if(i==1) return 0;
+	return start+1;
+}
 
 
 /*retorna 1 se encontrou, e deixa f setado no começo do registro encontrado
  * se não, f fica no começo*/
 
+int SearchKeyVar(FILE *f, char *key, int nfields){
+	char **reg;
+	long int start;
+	while(start=ReadRegVar(f,&reg,nfields)){
+		if(!strcmp(reg[1],key) &&  reg[0][0]=='s'){
+			fseek(f,start-1,SEEK_SET);
+			FreeT(reg,nfields);
+			return 1;
+		}
+		FreeT(reg,nfields);
+	}
+	return 0;
+}
+
 /*Description: Returns 1 if finded key in the principal key
- * return 0 if doesn't finded*/
+ * return 0 if doesn't finded
 int SearchKeyVar(FILE *f, char *key){
 	int tam=0, n=0;
 	int tam2=0;
@@ -429,4 +521,41 @@ int SearchKeyVar(FILE *f, char *key){
 		if(!SetCursesC( f, '\n', 1))	return 0;
 
 	}
+}
+*****************************************************/
+
+/*Description:	Returns 1 if str is num
+ * 				Returns 2 if str is alpha
+ * 				Returns 3 if str is alphanum
+ * 				Returns 0 if none of the ones
+ * 			before, or if str is NULL
+ * */
+int VerAlnum(char *str){
+	if(str==NULL)	return 0;
+
+	int alp=0, dig=0;
+	int i=0;
+	while(str[i]!=EOS){
+		if(isblank(str[i])){ i++; continue;}
+		if(!(isalpha(str[i])) && !(isdigit(str[i])))	return 0;
+
+		if(isalpha(str[i]))
+			alp++;
+		if(isdigit(str[i]))
+			dig++;
+		
+		
+
+		i++;
+	}
+
+	if(alp){
+		if(dig)		return 3;
+
+		return 2;
+	}
+
+	if(dig)		return 1;
+
+	return 0;
 }
