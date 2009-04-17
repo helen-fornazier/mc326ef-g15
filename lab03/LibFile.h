@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "LibWord.h"
 
 #ifndef EOS
@@ -178,7 +179,6 @@ int ReadRegFix2(FILE *f, char ***str, int *len, int nfields);
  * Return 0 if failed, 1 if not.
  */
 //só funciona se o último campo antes do caracter for obrigatório
-//int ReadRegVar(FILE *f, char ***str,int nfields);
 long int ReadRegVar(FILE *f, char ***reg, int fields);
 
 /*retorna 1 se encontrou, e deixa f setado no começo do registro encontrado
@@ -188,7 +188,18 @@ long int ReadRegVar(FILE *f, char ***reg, int fields);
  * return 0 if doesn't finded*/
 int SearchKeyVar(FILE *f, char *key, int nfields);
 
+/*Description:  Reads just a field
+ *
+ * Returns the number of the field*/
+int ReadField(FILE *f, char **vet);
 
+/*Description:	Returns 1 if str is num
+ * 				Returns 2 if str is alpha
+ * 				Returns 3 if str is alphanum
+ * 				Returns 0 if none of the ones
+ * 			before, or if str is NULL
+ * */
+int VerAlnum(char *str);
 
 
 #endif  /*LIB_FILE*/

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "LibFile.h"
 #include "LibWord.h"
 
@@ -10,39 +11,18 @@
 #define PRINT_TAM 1
 #define PRINT_DIV 0
 
-//typedef char*** REGIS;
 
 void MakeData(FILE *f, int **tab, int *nfields){
-	//*tab=(int**)malloc(sizeof(int*)*2);
 	(*tab)=(int*)malloc(sizeof(int)*(*nfields));
-	//(*tab)[1]=(int*)malloc(sizeof(int)*(*nfields));
 
 	int i;
 	for(i=0;i<*nfields;i++)
 		fscanf(f,"%d",&((*tab)[i]));
-//	for(i=0;i<*nfields;i++)
-//		fscanf(f,"%d",&((*tab)[1][i]));
 }
 
 int Print(FILE *f, char *c){
     return fwrite(c,sizeof(char),strlen(c),f);
 }
-
-/**********************************************
- * Mudei para imprimir o campo zero -- voltei
-int PrintRegister(FILE *f, char **reg, int camp){
-    int n=0, i;
-    char vet[100], vet2[100];
-    for(i=0;i<camp;i++){
-        if(reg[i][0]!='\0'){
-	   	   sprintf(vet,"%d>%s",(i+1),reg[i]);     
-           sprintf(vet2,"<%d><%s",(int)strlen(vet),vet);
-           n+=Print(f,vet2);
-        }
-    }
-    return n;
-}
-*************************************************/
 
 int PrintRegister(FILE *f,char **reg, int nfields){
 	int i, n;
@@ -65,7 +45,6 @@ int PrintRegister(FILE *f,char **reg, int nfields){
 int PrintAll(FILE *f, int type, REGIS reg, int treg, int camp){
     int n=0,i;
     char vet[3];
-   // sprintf(vet,"%c\n",end);
     for(i=0;i<treg;i++){
 
         sprintf(vet, "%s\n", reg[i][camp-1]);
@@ -178,7 +157,6 @@ int ReadStr( FILE* f, char **str, int len){
     return ver;
 }
 
-/*FALTA COLOCAR UNS AVISOS*/
 /*
  * f is a FILE the will be readed.
  * fieldList is a (char **) type that will be filled whith strings.
@@ -262,10 +240,6 @@ DATASTYLE* FillData(FILE* f){
 	MakeData(f, &(data->efield), &(data->nfield));
 	MakeData(f, &(data->ob), &(data->nfield));
 	
-//	data->efield = table[0];
-//	data->ob = table[1];
-//	free(table);
-
 	data->fieldname = (char**) malloc (sizeof(char*) * data->nfield );
 	if(data->fieldname == NULL ){
 		free(data->efield);
@@ -303,6 +277,7 @@ DATASTYLE* FillData(FILE* f){
 void CloseDatastyle(DATASTYLE *data){
 	free(data->efield);
 	free(data->ob);
+	free(data->alpha);
 	FreeT(data->fieldname, data->nfield);
 	free(data);
 }
@@ -356,57 +331,11 @@ int ReadRegFix2(FILE *f, char ***str, int *len, int nfields){
 }
 
 
-/*Description: Reads a file f whth variable format and puts
- * in str
+
+
+/*Description:  Reads just a field
  *
- * =>f is the file thar will be readed
- * =>***str is the addres of char **str, doesn't need to be inicialized
- * =>nfields is the number of fields in str
- *
- * Return 0 if failed, 1 if not.
- *
-
-//só funciona se o último campo antes do caracter for obrigatório
-int ReadRegVar(FILE *f, char ***str,int nfields){
-	int tam=0,  n=0, i=0;
-	(*str) = (char**) malloc( sizeof(char*)*nfields);
-
-	while(n<nfields-1){
-		if(!SetCursesC( f, '<', 1)){
-			FreeT((*str), n);	
-			return 0;
-		}
-		fscanf(f, "%d", &tam);
-
-
-		if(!SetCursesC( f, '<', 1)){
-			FreeT((*str), n);	
-			return 0;
-		}
-		fscanf(f, "%d", &n);
-
-		if(!SetCursesC( f, '>', 1)){
-			FreeT((*str), n);	
-			return 0;
-		}
- 	
-
-		for(; i<n; i++){                          
-			(*str)[i] = (char*) malloc(sizeof(char));
-			(*str)[i][0] = EOS;
-		}
-		
-		free((*str)[n-1]);
-		ReadStr(f, &( (*str)[n-1] ), tam-2);            //MUDAR DE N-1 PARA N SE O CAMPO 0 FOR A FLAG
-	}
-
-	ReadStr(f, &( (*str)[n] ), 1); //caracter separador
-	//if(fseek(f, (sizeof(char)*2), SEEK_CUR) != 0) return 0; //anda dois
-	return 1;
-}
-**********************************************************************************************************/
-
-
+ * Returns the number of the field*/
 int ReadField(FILE *f, char **vet){
 	int size, field;
 	unsigned char temp;
@@ -425,6 +354,17 @@ int ReadField(FILE *f, char **vet){
 
 	return field;
 }
+
+
+/*Description: Reads a file f whth variable format and puts
+ * in reg
+ *
+ * =>f is the file thar will be readed
+ * =>***reg is the addres of char **reg, doesn't need to be inicialized
+ * =>nfields is the number of fields in str
+ *
+ * Return 0 if failed, 1 if not.
+ */
 
 long int ReadRegVar(FILE *f, char ***reg, int fields){
 	int n, i=1;
@@ -463,11 +403,12 @@ long int ReadRegVar(FILE *f, char ***reg, int fields){
 
 /*retorna 1 se encontrou, e deixa f setado no começo do registro encontrado
  * se não, f fica no começo*/
-
+/*Description: Returns 1 if finded key in the principal key
+ * return 0 if doesn't finded*/
 int SearchKeyVar(FILE *f, char *key, int nfields){
 	char **reg;
 	long int start;
-	while(start=ReadRegVar(f,&reg,nfields)){
+	while((start=ReadRegVar(f,&reg,nfields))){
 		if(!strcmp(reg[1],key) &&  reg[0][0]=='s'){
 			fseek(f,start-1,SEEK_SET);
 			FreeT(reg,nfields);
@@ -478,51 +419,6 @@ int SearchKeyVar(FILE *f, char *key, int nfields){
 	return 0;
 }
 
-/*Description: Returns 1 if finded key in the principal key
- * return 0 if doesn't finded
-int SearchKeyVar(FILE *f, char *key){
-	int tam=0, n=0;
-	int tam2=0;
-	char *str = NULL;
-	char *ex = NULL;
-	while(1){
-		
-		if(!SetCursesC( f, '<', 1))		return 0;
-		fscanf(f, "%d", &tam);
-	
-		if(!SetCursesC( f, '<', 1))		return 0;  //TRATAR ERRO COM N==0
-		fscanf(f, "%d", &n);
-
-		if(!SetCursesC( f, '>', 1))		return 0;
-
-		ReadStr(f, &(ex), tam-2);
-
-		if(!SetCursesC( f, '<', 1))		return 0;
-		fscanf(f, "%d", &tam2);
-	
-		if(!SetCursesC( f, '<', 1))		return 0;  //TRATAR ERRO COM N==0
-		fscanf(f, "%d", &n);
-
-		if(!SetCursesC( f, '>', 1))		return 0;
-
-		ReadStr(f, &(str), tam2-2);
-
-
-		if(strcmp(key,str) == 0 && ex[0] == 's'){
-			if(fseek(f, (-1)* (sizeof(char)*(tam+tam2 + 8)), SEEK_CUR) != 0) return 0;		//volta pro começo do registro
-			free(ex);
-			free(str);
-			return 1;
-		}
-		
-		free(ex);
-		free(str);
-
-		if(!SetCursesC( f, '\n', 1))	return 0;
-
-	}
-}
-*****************************************************/
 
 /*Description:	Returns 1 if str is num
  * 				Returns 2 if str is alpha
