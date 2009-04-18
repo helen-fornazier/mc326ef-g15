@@ -6,6 +6,9 @@
 #include"LibFile.h"
 #include"LibMsg.h"
 
+#define TAMS 100
+#define TMS 30
+
 void PrintMenu(EFILE *e){
 	Msg( e, 0);
 	Msg( e, 1);
@@ -31,7 +34,7 @@ void VerOb(EFILE *e, DATASTYLE *data, REGIS matrix,  int i, int j){
 }
 
 /*Verifica a obrigatoriedade de um registro*/
-void VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i){
+int VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i){
 		int k=0;
 	
 		for(k=0; k<data->nfield; k++){
@@ -39,11 +42,14 @@ void VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i){
 			if((data->ob[k] == 1) && (str[k][0] == EOS)){
 				Msg(e, 12);
 				printf("%d, %d\n", i+1 , k+1);
+                return 0;
 			}
 		}
+
+        return 1;
 }
 
-void VerAl(EFILE *e, DATASTYLE *data, char **str,  int i){
+int VerAl(EFILE *e, DATASTYLE *data, char **str,  int i){
 		int k=0, ver=0;
 	
 		for(k=0; k<data->nfield; k++){
@@ -52,31 +58,37 @@ void VerAl(EFILE *e, DATASTYLE *data, char **str,  int i){
 			ver = VerAlnum(str[k]);
 			if(ver==1 && data->alpha[k]==2){
 				Msg(e, 16);
-				printf("%d, %d\n", i+1 , k+1);
+		   		printf("%d, %d\n", i+1 , k+1);
+                return 0;
 			}
 
 			if(ver==2 && data->alpha[k]==1){
 				Msg(e, 16);
 				printf("%d, %d\n", i+1 , k+1);
+                return 0;
 			}
 			
 			if(ver==0 && data->alpha[k]!=0){
 				Msg(e, 16);
 				printf("%d, %d\n", i+1 , k+1);
+                return 0;
 			}
 			if(ver==3 && data->alpha[k]!=3){
 				Msg(e, 16);
 				printf("%d, %d\n", i+1 , k+1);
+                return 0;
 			}
- 
+         
 		}
+
+        return 1;
 }
 
 
 
-void Option1(EFILE *e, DATASTYLE *data){
-	char in[100];
-	char out[100];
+int  Option1(EFILE *e, DATASTYLE *data){
+	char in[TAMS];
+	char out[TAMS];
 	FILE *fi, *fo1;
 
 	Msg( e, 9);
@@ -84,7 +96,7 @@ void Option1(EFILE *e, DATASTYLE *data){
 	fi = fopen(in, "r");
 	if(fi == NULL){
 		Msg(e, 11);
-		return;
+		return 1;
 	}
 
 	Msg( e, 10);
@@ -93,7 +105,7 @@ void Option1(EFILE *e, DATASTYLE *data){
 	if(fo1==NULL){
 		Msg( e, 11);
 		fclose(fi);
-		return;
+		return 1;
 	}
 
 	//-----------------
@@ -103,8 +115,19 @@ void Option1(EFILE *e, DATASTYLE *data){
 	int i = 0;
 	for(i=0; ; i++){
 		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
-		VerOb1(e, data, str, i);
-		VerAl(e, data, str, i);
+		if(!VerOb1(e, data, str, i)){
+		    FreeT(str, data->nfield);
+	        fclose(fi);
+	        fclose(fo1);
+            return 0;
+        }
+		if(!VerAl(e, data, str, i)){
+             FreeT(str, data->nfield);
+	        fclose(fi);
+	        fclose(fo1);
+            return 0;
+        }
+
 		if(str[0][0] == 's'){
 			PrintAll(fo1,PRINT_TAM,&str,1,data->nfield);	
 		}
@@ -113,11 +136,13 @@ void Option1(EFILE *e, DATASTYLE *data){
 
 	fclose(fi);
 	fclose(fo1);
+
+    return 1;
 }
 
 
 void Option2(EFILE *e, DATASTYLE *data){
-	char in[100];
+	char in[TAMS];
 	FILE *fi;
 
 	Msg( e, 9);
@@ -148,7 +173,7 @@ void Option2(EFILE *e, DATASTYLE *data){
 }
 
 void Option3(EFILE *e, DATASTYLE *data){
-	char in[100];
+	char in[TAMS];
 	FILE *fi;
 
 	Msg( e, 9);
@@ -161,16 +186,33 @@ void Option3(EFILE *e, DATASTYLE *data){
 
 	char **str = NULL;
 	
-//	ReadRegVar(fi, &str, data->nfield);
 	int i=0;
-	while(1){
-		if(!ReadRegVar(fi, &str, data->nfield)) break;
+    long int start=0, end=0, bytes=0;
+    long int posi=0, posf=0;
+    int len=0;
 
+	while(1){
+		if(!(start=ReadRegVar(fi, &str, data->nfield))) break;
+        start = start-1; //Pois a função acima detorna a posição mais 1
+        end = ftell(fi); //cursor posicionado no final do registro depois do /n
+        end=end-2;
+        bytes = end - start + 1;
+
+        posi = posi + start + 3;
 		if(str[0][0] == 's'){
-			for(i=1; i<data->nfield -1 ; i++){
-				printf("%s = %s |", data->fieldname[i], str[i]);
+
+            Msg(e, 17);
+            printf("*****(%ld-%ld|%ld bytes) => ", start, end, bytes);
+			for(i=0; i<data->nfield -1 ; i++){
+                len = strlen(str[i]);
+                posf = posi + len-1;
+				printf("%s = %s (%ld-%ld|%d bytes)|", data->fieldname[i], str[i],posi, posf, len);
+                posi = posf+3;
 			}
-			printf("%s = %s\n", data->fieldname[i], str[i]);
+
+            len = strlen(str[i]);
+            posf = posi + len -1;
+			printf("%s = %s (%ld-%ld|%d bytes)\n", data->fieldname[i], str[i], posi, posf, len);
 		}
 
 		FreeT(str, data->nfield);
@@ -179,7 +221,7 @@ void Option3(EFILE *e, DATASTYLE *data){
 }
 
 void Option4(EFILE *e, DATASTYLE *data){
-	char in[100];
+	char in[TAMS];
 	FILE *fi;
 
 	Msg( e, 9);
@@ -192,7 +234,7 @@ void Option4(EFILE *e, DATASTYLE *data){
 	
 	int i=0;
 	char **str;
-	char key[100];
+	char key[TAMS];
 	Msg( e, 13);
 	scanf("%s", key);
 
@@ -215,8 +257,8 @@ void Option4(EFILE *e, DATASTYLE *data){
 }
 
 void Option6(EFILE *e, DATASTYLE *data){
-	char in[100];
-	char out[100];
+	char in[TAMS];
+	char out[TAMS];
 	FILE *fi, *fo1;
 
 	Msg( e, 9);
@@ -244,7 +286,7 @@ void Option6(EFILE *e, DATASTYLE *data){
 	while((start=ReadRegVar(fi,&vet,data->nfield))){
 		if(vet[0][0]=='s'){
 			fprintf(fo1,"%s ",vet[1]);
-			fprintf(fo1,"%ld\n",start);
+			fprintf(fo1,"%ld\n",start-1);
 		}
 		FreeT(vet,data->nfield);
 	}
@@ -254,123 +296,10 @@ void Option6(EFILE *e, DATASTYLE *data){
 	fclose(fo1);
 }
 
-/*************************************************
-void Option6(EFILE *e, DATASTYLE *data){
-	char in[100];
-	char out[100];
-	FILE *fi, *fo1;
-
-	Msg( e, 9);
-	scanf("%s", in);
-	fi = fopen(in, "r");
-	if(fi == NULL){
-		Msg(e, 11);
-		return;
-	}
-
-	Msg( e, 10);
-	scanf("%s", out);
-	fo1 = fopen(out, "w");
-	if(fo1==NULL){
-		Msg( e, 11);
-		fclose(fi);
-		return;
-	}
-
-	//-----------------
-
-	long int addres = 0;
-	char *str = NULL;
-	char *ex = NULL;
-	int tam=0, n=0;
-	int tam2=0;
-
-
-	
-	while(1){
-
-		addres = ftell(fi);
-
-		if(!SetCursesC( fi, '<', 1)){
-			fclose(fi);
-			fclose(fo1);
-			return;
-		}
-		fscanf(fi, "%d", &tam);
-	
-		if(!SetCursesC( fi, '<', 1)){
-			fclose(fi);
-			fclose(fo1);
-			return;
-		}
-		fscanf(fi, "%d", &n);
-
-		if(!SetCursesC( fi, '>', 1)){
-			fclose(fi);
-			fclose(fo1);
-			return;
-		}
- 
-
-		ReadStr(fi, &(ex), tam-2);
-
-		if(!SetCursesC( fi, '<', 1)){
-			free(ex);
-			fclose(fi);
-			fclose(fo1);
-			return;
-		}
- 
-		fscanf(fi, "%d", &tam2);
-	
-		if(!SetCursesC( fi, '<', 1)){
-			free(ex);
-			fclose(fi);
-			fclose(fo1);
-			return;
-		}
- 
-		fscanf(fi, "%d", &n);
-
-		if(!SetCursesC( fi, '>', 1)){
-			free(ex);
-			fclose(fi);
-			fclose(fo1);
-			return;
-		}
- 
-
-		ReadStr(fi, &(str), tam2-2);
-		
-		if(ex[0] == 's'){
-			fprintf(fo1, "%s ", str);
-			fprintf(fo1, "%ld\n", addres);
-
-		}
-		
-
-		free(ex);
-		free(str);
-
-		if(!SetCursesC( fi, '\n', 1)){
-			fclose(fi);
-			fclose(fo1);
-			return;
-		}
- 
-
-	}
-
-	fclose(fi);
-	fclose(fo1);
-
-}
-*****************************************************/
-
 void Option7(EFILE *e, DATASTYLE *data){
-	char in[100];
-	char out[100];
-	char sys[30];
+	char in[TAMS];
+	char out[TAMS];
+	char sys[TMS];
 
 	Msg( e, 9);
 	scanf("%s", in);

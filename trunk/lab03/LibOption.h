@@ -11,11 +11,11 @@
 
 void PrintMenu(EFILE *e);
 
-void VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i); //ver obrigatoriedade do campo
+int VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i); //ver obrigatoriedade do campo
 
-void VerAl(EFILE *e, DATASTYLE *data, char **str,  int i);	//Verifica config alphanum
+int VerAl(EFILE *e, DATASTYLE *data, char **str,  int i);	//Verifica config alphanum
 
-void Option1(EFILE *e, DATASTYLE *data);
+int Option1(EFILE *e, DATASTYLE *data);
 
 void Option2(EFILE *e, DATASTYLE *data);
 
