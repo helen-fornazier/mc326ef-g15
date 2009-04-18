@@ -9,12 +9,12 @@ s085923 Vanessa Mae             Cinga Pura                       F 09#
 s067384 Julio Cesar             Brasilia                91111132 M 10# 
 s043982 Guajarina Macara                                           53#
 s024873 Michael Jackson         New Orleans    84739287 95553234   33#
-s000000 Jesus Cristo            Belem-Pa                           33#
+s000000 Jesus Cristo            Belem Pa                           33#
 n057364 Maraiah Cary                           63746764            45#
 s102937 ALANIS MORISSETE        NEw york                34543332   12#
 s038273 Princesa Fiona          Far far away   34526352          F 21#
 s099998 Beijamin Franklin       Etiopia                 36236432   19#
-s039482                                                 23232322 F 17#
+s039482 Joao                                            23232322 F 17#
 s012323 Carmen Miranda          Brasilia                         F 97#
 s048293 Sand Saraf              Poorcity                         F 69#
 s036462 Hiro Nakamura           japao                              42#

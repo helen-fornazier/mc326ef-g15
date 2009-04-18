@@ -51,7 +51,7 @@ char* Corrector(char *str){
                 if(str[i+1]==SPACE) strout[j++]=SPACE; // e se o proximo for espaco, copie o espaco
             }
         }
-        if(strout[j-1]==SPACE){ //Se o ultimo caractere for um espaco, transforma este em um EOS.( Nao se perde memoria, pois ao haver
+        if(j!=0 && strout[j-1]==SPACE){ //Se o ultimo caractere for um espaco, transforma este em um EOS.( Nao se perde memoria, pois ao haver
             strout[j-1]=EOS;    //espaco no final, o j eh incrementado )
         }
         else strout[j]=EOS; //Se nao, finaliza 

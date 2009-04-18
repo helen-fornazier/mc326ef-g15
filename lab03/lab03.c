@@ -31,7 +31,8 @@ int main(int argc, char *argv[]){
 	
 		switch(op){
 		case 1:
-			Option1(e, data);	break;
+			if(!Option1(e, data))   op=0;	
+            break;
 		case 2:
 			Option2(e, data);	break;
 		case 3:

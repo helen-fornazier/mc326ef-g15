@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include"LibWord.h"
 
+#define TAMS 200
 typedef struct error{
 	char **msg;   //where will be placed all messages from the program
 	int n;
@@ -17,7 +18,7 @@ typedef struct error{
 
 EFILE* MakeMsg(char *fname){
     FILE *f;
-    char temp[200], temp0='\0';
+    char temp[TAMS], temp0='\0';
     int i=0, j;
 	EFILE *e = (EFILE*)malloc( sizeof(EFILE) );
 	if(e==NULL)	return NULL;

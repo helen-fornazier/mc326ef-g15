@@ -10,8 +10,8 @@
 
 #define PRINT_TAM 1
 #define PRINT_DIV 0
-
-
+#define TAMS 100
+#define TMS 10
 void MakeData(FILE *f, int **tab, int *nfields){
 	(*tab)=(int*)malloc(sizeof(int)*(*nfields));
 
@@ -27,7 +27,7 @@ int Print(FILE *f, char *c){
 int PrintRegister(FILE *f,char **reg, int nfields){
 	int i, n;
 	n=0;
-	char vet[100];
+	char vet[TAMS];
 	
 	for(i=0;i<nfields;i++)
 		if(*reg[i]!='\0'){		
@@ -44,7 +44,7 @@ int PrintRegister(FILE *f,char **reg, int nfields){
 
 int PrintAll(FILE *f, int type, REGIS reg, int treg, int camp){
     int n=0,i;
-    char vet[3];
+    char vet[TMS];
     for(i=0;i<treg;i++){
 
         sprintf(vet, "%s\n", reg[i][camp-1]);
