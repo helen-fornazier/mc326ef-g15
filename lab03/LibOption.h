@@ -23,8 +23,10 @@ void Option3(EFILE *e, DATASTYLE *data);
 
 void Option4(EFILE *e, DATASTYLE *data);
 
-void Option6(EFILE *e, DATASTYLE *data);
+DATASTYLE *Option6(EFILE *e, DATASTYLE *data);
 
 void Option7(EFILE *e, DATASTYLE *data);
+
+DATASTYLE *WriteIndData(EFILE *e, DATASTYLE *data);
 
 #endif    //LIB_OPT
