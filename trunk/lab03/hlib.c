@@ -274,3 +274,54 @@ int SearchKeyVar(FILE *f, char *key){
 
 	}
 }
+
+
+int ReadReadVar(FILE *f, char ***str,int nfields){
+	int tam, tam2, n;
+	int i;
+
+	(*str) = (char**)malloc(sizeof(char)*nfields);
+
+	if(fread(&tam, sizeof(char), 1, f)!=1); //ERR
+	if(fread(&n, sizeof(char), 1, f)!=1); //ERR
+
+	ReadStr(f, &((*str)[n-1]), tam2-2);
+	for(; i<n; i++){
+		(*str)[i] = (char*)malloc(sizeof(char));
+		(*str)[i][0] = EOS;
+	}
+
+	
+}
+
+
+/**Description:   Returns 1 if str is num
+ * 				  Returns 2 if str is alp
+ * 				  Returns 3 if str is alphanum
+ * 				  Returns 0 if str none of the ones
+ * 			before, or if str is NULL
+ */
+int VerAlnum(char *str){
+	if(str==NULL)	return 0;
+
+	int alp=0, dig=0;
+	int i=0;
+	while(str[i]!=EOS){
+		if(isalpha(str[i]))
+			alp++;
+		if(isdigit(str[i]))
+			dig++;
+
+		i++;
+	}
+
+	if(alp){
+		if(dig)		return 3;
+		
+		return 2;
+	}
+	
+	if(dig)	return 1;
+
+	return 0;
+}
