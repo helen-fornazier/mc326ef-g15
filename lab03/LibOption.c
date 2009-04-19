@@ -9,6 +9,8 @@
 #define TAMS 100
 #define TMS 30
 
+#define DATAIND "dataind.config"
+
 void PrintMenu(EFILE *e){
 	Msg( e, 0);
 	Msg( e, 1);
@@ -286,14 +288,33 @@ void Option6(EFILE *e, DATASTYLE *data){
 	while((start=ReadRegVar(fi,&vet,data->nfield))){
 		if(vet[0][0]=='s'){
 			fprintf(fo1,"%s ",vet[1]);
-			fprintf(fo1,"%ld\n",start-1);
+			start = start-1;
+			//fprintf(fo1,"%ld\n",start);
+			fwrite(&(start), sizeof(long int), 1, fo1);
+			fprintf(fo1, "%c\n", vet[data->nfield-1][0]);
 		}
 		FreeT(vet,data->nfield);
 	}
 
+	if(!WriteIndData(e, data))	Msg( e, 18);
 
 	fclose(fi);
 	fclose(fo1);
+}
+
+int WriteIndData(EFILE *e, DATASTYLE *data){
+	FILE *find = fopen(DATAIND, "w");
+	if(find == NULL){
+		Msg( e, 11);
+		return 0;
+	}
+
+	fprintf(find, "%d\n", 3);
+	fprintf(find, "%d %d %d\n", data->efield[1], sizeof(long int), data->efield[data->nfield-1]);
+
+	fclose(find);
+	
+	return 1;
 }
 
 void Option7(EFILE *e, DATASTYLE *data){
