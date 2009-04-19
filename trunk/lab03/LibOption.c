@@ -5,10 +5,14 @@
 #include"LibWord.h"
 #include"LibFile.h"
 #include"LibMsg.h"
+#include "LibOption.h"
 
 #define TAMS 100
 #define TMS 30
 
+#define TAMIND 3
+
+#define DATAINDN "dataindn.config"
 #define DATAIND "dataind.config"
 
 void PrintMenu(EFILE *e){
@@ -53,9 +57,11 @@ int VerOb1(EFILE *e, DATASTYLE *data, char **str,  int i){
 
 int VerAl(EFILE *e, DATASTYLE *data, char **str,  int i){
 		int k=0, ver=0;
+
 	
 		for(k=0; k<data->nfield; k++){
-			if(str[k][0] == EOS)	continue;
+
+			if(str[k][0] == EOS || data->alpha[k] == 4)	continue;
 
 			ver = VerAlnum(str[k]);
 			if(ver==1 && data->alpha[k]==2){
@@ -161,7 +167,8 @@ void Option2(EFILE *e, DATASTYLE *data){
 	while(1){
 		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
 		
-		if(str[0][0] == 's'){
+		
+		if(str[0][0] != 'n'){
 			for(i=1; i<data->nfield -1 ; i++){
 				printf("%s = %s |", data->fieldname[i], str[i]);
 			}
@@ -258,7 +265,38 @@ void Option4(EFILE *e, DATASTYLE *data){
 	fclose(fi);
 }
 
-void Option6(EFILE *e, DATASTYLE *data){
+DATASTYLE *WriteIndData(EFILE *e, DATASTYLE *data){
+	FILE *find = fopen(DATAIND, "w");
+//	char **names = {NAME1, NAME2, NAME3};
+	if(find == NULL){
+		Msg( e, 11);
+		return NULL;
+	}
+
+	DATASTYLE *dataind = InitDatastyle();
+
+	fprintf(find, "%d\n", TAMIND);
+	dataind->nfield = TAMIND;
+	fprintf(find, "%d %d %d\n", data->efield[1], sizeof(long int), data->efield[data->nfield-1]);
+
+	dataind->efield = (int*) malloc(sizeof(int) * TAMIND);
+
+	dataind->efield[0] = data->efield[1];
+	dataind->efield[1] = sizeof(long int);
+	dataind->efield[2] = data->efield[data->nfield-1];
+
+	FILE* fn = fopen(DATAINDN, "r");
+	MakeDataS(fn, &(data->fieldname), data->nfield);
+	fclose(fn);
+	
+
+	fclose(find);
+	
+	return dataind;
+}
+
+
+DATASTYLE *Option6(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
 	char out[TAMS];
 	FILE *fi, *fo1;
@@ -268,7 +306,7 @@ void Option6(EFILE *e, DATASTYLE *data){
 	fi = fopen(in, "r");
 	if(fi == NULL){
 		Msg(e, 11);
-		return;
+		return NULL;
 	}
 
 	Msg( e, 10);
@@ -277,11 +315,11 @@ void Option6(EFILE *e, DATASTYLE *data){
 	if(fo1==NULL){
 		Msg( e, 11);
 		fclose(fi);
-		return;
+		return NULL;
 	}
 
 	//-----------------
-
+	DATASTYLE *dataind = NULL;
 	long int start;
 	char **vet;
 
@@ -296,26 +334,19 @@ void Option6(EFILE *e, DATASTYLE *data){
 		FreeT(vet,data->nfield);
 	}
 
-	if(!WriteIndData(e, data))	Msg( e, 18);
-
 	fclose(fi);
 	fclose(fo1);
-}
 
-int WriteIndData(EFILE *e, DATASTYLE *data){
-	FILE *find = fopen(DATAIND, "w");
-	if(find == NULL){
-		Msg( e, 11);
-		return 0;
+	dataind = WriteIndData(e, data);
+
+	if(  dataind == NULL){
+		Msg( e, 18);
+		return NULL;
 	}
 
-	fprintf(find, "%d\n", 3);
-	fprintf(find, "%d %d %d\n", data->efield[1], sizeof(long int), data->efield[data->nfield-1]);
-
-	fclose(find);
-	
-	return 1;
+	return dataind;
 }
+
 
 void Option7(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
@@ -342,8 +373,44 @@ void Option7(EFILE *e, DATASTYLE *data){
 }
 
 
+//Já supondo que dataind != null
+void Option8(EFILE *e, DATASTYLE *data){
+	char in[TAMS];
+	FILE *fi;
+	long int *ld;
 
-void Option8(){}
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	char **str = NULL;
+	int i = 0;
+
+	while(1){
+		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
+		
+		
+		if(str[0][0] != 'n'){
+			for(i=0; i<data->nfield -1 ; i++){
+				if(i==1){
+					ld=(long int)str[i];
+					printf("%s = %ld |", data->fieldname[i], *ld);
+				}
+				else printf("%s = %s |", data->fieldname[i], str[i]);
+			}
+			printf("%s = %s\n", data->fieldname[i], str[i]);
+		}
+		FreeT(str, data->nfield);
+	}
+	
+	fclose(fi);
+
+	
+}
 void Option9(){}
 void Option10(){}
 void Option11(){}

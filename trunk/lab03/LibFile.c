@@ -12,12 +12,21 @@
 #define PRINT_DIV 0
 #define TAMS 100
 #define TMS 10
-void MakeData(FILE *f, int **tab, int *nfields){
+int MakeData(FILE *f, int **tab, int *nfields){
 	(*tab)=(int*)malloc(sizeof(int)*(*nfields));
+	if( (*tab) == NULL ){
+		free(*tab);
+		return 0;
+	}
 
 	int i;
-	for(i=0;i<*nfields;i++)
-		fscanf(f,"%d",&((*tab)[i]));
+	for(i=0;i<*nfields;i++){
+		if(fscanf(f,"%d",&((*tab)[i])) == EOF){
+			free(*tab);
+			return 0;
+		}
+	}
+	return 1;
 }
 
 int Print(FILE *f, char *c){
@@ -227,51 +236,69 @@ DATASTYLE *InitDatastyle(){
  *		int *ob;			
  *		char *fieldname;		
  *	*/
-DATASTYLE* FillData(FILE* f){
-	int i, j;
-
+DATASTYLE* FillData(FILE* f){  //MUDEI PARA PREENCHER OS DADOS EXISTENTES EM DATA
 	if(f==NULL)		return NULL;
 
 	DATASTYLE *data = InitDatastyle();
 	if(data == NULL)	return NULL;
+
+	if(feof(f))	return data;
+
 	fscanf(f,"%d", &(data->nfield));
 	
 	//int **table;
-	MakeData(f, &(data->efield), &(data->nfield));
-	MakeData(f, &(data->ob), &(data->nfield));
-	
-	data->fieldname = (char**) malloc (sizeof(char*) * data->nfield );
-	if(data->fieldname == NULL ){
-		free(data->efield);
-		free(data->ob);
-		return NULL;
+	if(!MakeData(f, &(data->efield), &(data->nfield)))	return data;
+
+	if(!MakeData(f, &(data->ob), &(data->nfield)))	return data;
+	if(feof(f))	return data;
+
+	if(!MakeDataS(f, &(data->fieldname), data->nfield)){
+		return data;
+		if(feof(f))	return data;
 	}
 
-	/*ARRUMAR ESTE PEDAÇO*/
-	
-	for(i=0; i<data->nfield; i++){
-		data->fieldname[i] = (char*) malloc( sizeof(char) * 200 );
-	}
-
-	for(i=0; i<data->nfield; i++){
-			SetCursesC(f, '"', 1);	
-		for(j=0; ; j++){
-
-			fscanf(f, "%c", &(data->fieldname[i][j]));
-
-			if(data->fieldname[i][j] == '"' || data->fieldname[i][j] == EOF ){
-				data->fieldname[i][j] = EOS;
-				break;
-			}
-		}
-	}
-
-
-	MakeData(f, &(data->alpha), &(data->nfield));
+	if(!MakeData(f, &(data->alpha), &(data->nfield)))	return data;
 
 	return data;
 }
 
+int MakeDataS(FILE *f, char ***str, int nfield){
+	(*str) = InitRegis(nfield);
+	if((*str) == NULL ){
+		return 0;
+	}
+
+	int i=0, j=0;
+	/*ARRUMAR ESTE PEDAÇO*/
+	
+	for(i=0; i<nfield; i++){
+		(*str)[i] = (char*) malloc( sizeof(char) * TAMS );
+		if((*str)[i] == NULL){
+			FreeT((*str), nfield);
+			return 0;
+		}
+	}
+
+	for(i=0; i<nfield; i++){
+			SetCursesC(f, '"', 1);	//VER QUANDO ELE ENCONTRA O EOF
+		for(j=0; ; j++){
+			
+			if(feof(f)){
+				FreeT((*str), nfield);
+				return 0;
+			}
+
+			fscanf(f, "%c", &((*str)[i][j]));
+
+			if((*str)[i][j] == '"' || (*str)[i][j] == EOF ){
+				(*str)[i][j] = EOS;
+				break;
+			}
+		}
+	}
+	
+	return 1;
+}
 
 /*Description: Free all data of a struct DATASTYLE data*/
 void CloseDatastyle(DATASTYLE *data){

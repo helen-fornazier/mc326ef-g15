@@ -44,7 +44,7 @@ typedef struct regis{
  * tab-> adress of the matrix that will containd the size of the fields and it's obligatoriety
  * nfields-> adres of an int where will be place the number of fields that the registers have
  */
-void MakeData(FILE *f, int **tab, int *nfields);
+int MakeData(FILE *f, int **tab, int *nfields);
 
 /*Description:  Prints the string c in file f
  *
