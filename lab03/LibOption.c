@@ -515,8 +515,64 @@ void Option10(EFILE *e, DATASTYLE *data){
 	fclose(fo1);
 
 }
-void Option11(){}
-void Option12(){}
+
+
+void Option11(EFILE e, DATASTYLE *search, DATASTYLE *find){
+	char sname[100], fname[100], key[50];
+	FILE *fs, *ff;
+	int i;
+
+	msg(e,20);
+	scanf("%s",sname);
+	fs=fopen(sname,"r");
+	if(fs==NULL){
+		msg(e,11);
+		return;
+	}
+	msg(e,21);
+	scanf("%s",fname);
+	ff=fopen(fname,"r");
+	if(ff==NULL){
+		fclose(fs);
+		msg(e,11);
+		return;
+	}
+	msg(e,13);
+	scanf("%s",key);
+
+	i=BinaryKeySearch(sf,ff,search,find,key);
+	if(!i){
+		msg(e,15);
+	}
+	fclose(fs);
+	fclose(ff);
+}
+
+
+void Option12(EFILE e, DATASTYLE config){
+char fname[100], key[50];
+int i;
+
+	msg(e,9);
+	scanf("%s",fname);
+	f=fopen(sname,"r");
+	if(f==NULL){
+		msg(e,11);
+		return;
+	}
+	
+	msg(e,22);
+	scanf("%s",key);
+
+	i=EraseReg(f,key,config->nfield);
+	if(i){
+		msg(e,23);
+	}
+	else{
+		msg(e,15);
+	}
+	fclose(f);
+}
 
 
 
