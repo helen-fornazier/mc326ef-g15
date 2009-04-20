@@ -81,7 +81,7 @@ void Option11(EFILE e, DATASTYLE *search, DATASTYLE *find){
 	fclose(ff);
 }
 
-int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char *key){
+int BinaryKeySearch(FILE *s, FILE *ff, DATASTYLE *search, DATASTYLE *find, char *key){
 	int regsize, i, signal;
 	long int position, start, end, temp, step1, step2;
 	char *reg;

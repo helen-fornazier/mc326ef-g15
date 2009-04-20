@@ -201,5 +201,12 @@ int ReadField(FILE *f, char **vet);
  * */
 int VerAlnum(char *str);
 
+/* Receives a file, the number of fields each register has and a primary key that the user
+ * wants to be logicaly removed.
+ * Returns 0 if the key is not found
+ * and 1 if it is deleted*/
+int EraseReg(FILE *f, char *vet, int nfields);
+
+int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char *key);
 
 #endif  /*LIB_FILE*/
