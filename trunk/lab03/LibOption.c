@@ -92,7 +92,36 @@ int VerAl(EFILE *e, DATASTYLE *data, char **str,  int i){
         return 1;
 }
 
+int Fixtovar(EFILE *e, FILE *fi, FILE *fo1, DATASTYLE *data){
+	char **str = NULL;
+	int i = 0;
+	for(i=0; ; i++){
+		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
+		if(!VerOb1(e, data, str, i)){
+		    FreeT(str, data->nfield);
+            return 0;
+        }
+		if(!VerAl(e, data, str, i)){
+             FreeT(str, data->nfield);
+            return 0;
+        }
 
+		if(str[0][0] == 's'){
+			PrintAll(fo1,PRINT_TAM,&str,1,data->nfield);	
+		}
+		FreeT(str, data->nfield);
+	}
+
+	return 1;
+}
+
+void PrintOne(DATASTYLE *data, char **str, int first){
+	int i=0;
+	for(i=first; i<data->nfield -1 ; i++){
+		printf("%s = %s |", data->fieldname[i], str[i]);
+	}
+	printf("%s = %s\n", data->fieldname[i], str[i]);
+}
 
 int  Option1(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
@@ -117,29 +146,10 @@ int  Option1(EFILE *e, DATASTYLE *data){
 	}
 
 	//-----------------
-	
-	
-	char **str = NULL;
-	int i = 0;
-	for(i=0; ; i++){
-		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
-		if(!VerOb1(e, data, str, i)){
-		    FreeT(str, data->nfield);
-	        fclose(fi);
-	        fclose(fo1);
-            return 0;
-        }
-		if(!VerAl(e, data, str, i)){
-             FreeT(str, data->nfield);
-	        fclose(fi);
-	        fclose(fo1);
-            return 0;
-        }
-
-		if(str[0][0] == 's'){
-			PrintAll(fo1,PRINT_TAM,&str,1,data->nfield);	
-		}
-		FreeT(str, data->nfield);
+	if(!Fixtovar(e, fi, fo1, data)){
+		fclose(fi);
+		fclose(fo1);
+		return 0;
 	}
 
 	fclose(fi);
@@ -148,6 +158,22 @@ int  Option1(EFILE *e, DATASTYLE *data){
     return 1;
 }
 
+void Printfix(EFILE *e, FILE *fi, DATASTYLE *data){
+	char **str = NULL;
+	int i = 0;
+
+	while(1){
+		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
+		
+		
+		if(str[0][0] != 'n'){
+			//------
+			PrintOne(data, str, 1);
+		}
+		FreeT(str, data->nfield);
+	}
+
+}
 
 void Option2(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
@@ -160,39 +186,15 @@ void Option2(EFILE *e, DATASTYLE *data){
 		Msg(e, 11);
 		return;
 	}
+//----------------
 
-	char **str = NULL;
-	int i = 0;
+	Printfix(e, fi, data);
 
-	while(1){
-		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
-		
-		
-		if(str[0][0] != 'n'){
-			for(i=1; i<data->nfield -1 ; i++){
-				printf("%s = %s |", data->fieldname[i], str[i]);
-			}
-			printf("%s = %s\n", data->fieldname[i], str[i]);
-		}
-		FreeT(str, data->nfield);
-	}
-	
 	fclose(fi);
 
 }
 
-void Option3(EFILE *e, DATASTYLE *data){
-	char in[TAMS];
-	FILE *fi;
-
-	Msg( e, 9);
-	scanf("%s", in);
-	fi = fopen(in, "r");
-	if(fi == NULL){
-		Msg(e, 11);
-		return;
-	}
-
+void Printvar(EFILE *e, FILE *fi, DATASTYLE *data){
 	char **str = NULL;
 	
 	int i=0;
@@ -226,7 +228,47 @@ void Option3(EFILE *e, DATASTYLE *data){
 
 		FreeT(str, data->nfield);
 	}
+
+}
+
+
+void Option3(EFILE *e, DATASTYLE *data){
+	char in[TAMS];
+	FILE *fi;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return;
+	}
+
+	//------------
+	Printvar(e, fi, data);
+
 	fclose(fi);
+}
+
+
+void SearchandPrint(EFILE *e, FILE *fi, DATASTYLE *data){
+	int i=0;
+	char **str;
+	char key[TAMS];
+	Msg( e, 13);
+	scanf("%s", key);
+
+
+	if(SearchKeyVar(fi, key,data->nfield)){
+		if(!ReadRegVar(fi, &str, data->nfield)){
+			Msg(e, 14);
+			return;
+		}
+		//----
+		PrintOne(data, str, 1);		
+		FreeT(str, data->nfield);
+	}
+	else Msg( e, 15);
 }
 
 void Option4(EFILE *e, DATASTYLE *data){
@@ -241,27 +283,9 @@ void Option4(EFILE *e, DATASTYLE *data){
 		return;
 	}
 	
-	int i=0;
-	char **str;
-	char key[TAMS];
-	Msg( e, 13);
-	scanf("%s", key);
-
-
-	if(SearchKeyVar(fi, key,data->nfield)){
-		if(!ReadRegVar(fi, &str, data->nfield)){
-			Msg(e, 14);
-			return;
-		}
-		
-		for(i=1; i<data->nfield -1 ; i++){
-			printf("%s = %s |", data->fieldname[i], str[i]);
-		}
-		printf("%s = %s\n", data->fieldname[i], str[i]);
-		FreeT(str, data->nfield);
-	}
-	else Msg( e, 15);
-
+//----------------
+	SearchandPrint(e, fi, data);
+	
 	fclose(fi);
 }
 
@@ -286,7 +310,7 @@ DATASTYLE *WriteIndData(EFILE *e, DATASTYLE *data){
 	dataind->efield[2] = data->efield[data->nfield-1];
 
 	FILE* fn = fopen(DATAINDN, "r");
-	MakeDataS(fn, &(data->fieldname), data->nfield);
+	MakeDataS(fn, &(dataind->fieldname), dataind->nfield);
 	fclose(fn);
 	
 
@@ -295,6 +319,31 @@ DATASTYLE *WriteIndData(EFILE *e, DATASTYLE *data){
 	return dataind;
 }
 
+int MakeOneInd(EFILE *e, FILE *fi, FILE *fo1, DATASTYLE *data){
+	long int start;
+	char **vet;
+
+	if(start=ReadRegVar(fi,&vet,data->nfield)){
+		if(vet[0][0]=='s'){
+			fprintf(fo1,"%s ",vet[1]);
+			start = start-1;
+			//fprintf(fo1,"%ld\n",start);
+			fwrite(&(start), sizeof(long int), 1, fo1);
+			fprintf(fo1, "%c\n", vet[data->nfield-1][0]);
+		}
+
+		FreeT(vet,data->nfield);
+	return 1;
+	}
+	return 0;
+}
+
+
+void MakeInd(EFILE *e, FILE *fi, FILE *fo1, DATASTYLE *data){
+
+	while(MakeOneInd(e, fi, fo1, data));
+	
+}
 
 DATASTYLE *Option6(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
@@ -319,27 +368,16 @@ DATASTYLE *Option6(EFILE *e, DATASTYLE *data){
 	}
 
 	//-----------------
-	DATASTYLE *dataind = NULL;
-	long int start;
-	char **vet;
-
-	while((start=ReadRegVar(fi,&vet,data->nfield))){
-		if(vet[0][0]=='s'){
-			fprintf(fo1,"%s ",vet[1]);
-			start = start-1;
-			//fprintf(fo1,"%ld\n",start);
-			fwrite(&(start), sizeof(long int), 1, fo1);
-			fprintf(fo1, "%c\n", vet[data->nfield-1][0]);
-		}
-		FreeT(vet,data->nfield);
-	}
-
+	
+	MakeInd(e, fi, fo1, data);
+	
 	fclose(fi);
 	fclose(fo1);
 
+	DATASTYLE *dataind = NULL;
 	dataind = WriteIndData(e, data);
 
-	if(  dataind == NULL){
+	if( dataind == NULL){
 		Msg( e, 18);
 		return NULL;
 	}
@@ -347,17 +385,8 @@ DATASTYLE *Option6(EFILE *e, DATASTYLE *data){
 	return dataind;
 }
 
-
-void Option7(EFILE *e, DATASTYLE *data){
-	char in[TAMS];
-	char out[TAMS];
+void Ordena(char *in, char *out){
 	char sys[TMS];
-
-	Msg( e, 9);
-	scanf("%s", in);
-
-	Msg( e, 10);
-	scanf("%s", out);
 
 	if(strcmp(in,out)!=0){
 		sprintf(sys, "sort -d %s > %s", in, out);
@@ -370,14 +399,59 @@ void Option7(EFILE *e, DATASTYLE *data){
 		sprintf(sys, "mv temp.txt %s", in);
 		system(sys);
 	}
+	
 }
 
+void Option7(EFILE *e, DATASTYLE *data){
+	char in[TAMS];
+	char out[TAMS];
+
+	Msg( e, 9);
+	scanf("%s", in);
+
+	Msg( e, 10);
+	scanf("%s", out);
+
+	//-----------
+
+	Ordena(in, out);
+
+}
+
+
+int PrintOneInd(EFILE *e, FILE *fi,  DATASTYLE *data){
+	char **str = NULL;
+	int i = 0;
+	long int *ld=NULL;
+
+		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) return 0;
+		
+		
+		for(i=0; i<data->nfield -1 ; i++){
+			if(i==1){
+				ld=(long int)str[i];
+				printf("%s = %ld |", data->fieldname[i], (*ld));
+			}
+			else printf("%s = %s |", data->fieldname[i], str[i]);
+		}
+		printf("%s = %s\n", data->fieldname[i], str[i]);
+		
+		FreeT(str, data->nfield);
+		return 1;
+}
+
+	
+
+
+int PrintInd(EFILE *e, FILE *fi, DATASTYLE *data){
+	while(PrintOneInd(e, fi, data));
+
+}
 
 //Já supondo que dataind != null
 void Option8(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
 	FILE *fi;
-	long int *ld;
 
 	Msg( e, 9);
 	scanf("%s", in);
@@ -386,33 +460,61 @@ void Option8(EFILE *e, DATASTYLE *data){
 		Msg(e, 11);
 		return;
 	}
+	//-------
+	PrintInd(e, fi,data);
 
-	char **str = NULL;
-	int i = 0;
-
-	while(1){
-		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
-		
-		
-		if(str[0][0] != 'n'){
-			for(i=0; i<data->nfield -1 ; i++){
-				if(i==1){
-					ld=(long int)str[i];
-					printf("%s = %ld |", data->fieldname[i], *ld);
-				}
-				else printf("%s = %s |", data->fieldname[i], str[i]);
-			}
-			printf("%s = %s\n", data->fieldname[i], str[i]);
-		}
-		FreeT(str, data->nfield);
-	}
-	
 	fclose(fi);
 
 	
 }
-void Option9(){}
-void Option10(){}
+void Option9(EFILE *e, DATASTYLE *data){
+	char in[TAMS];
+	FILE *fi, *fo1;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	Ordena(in,in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return NULL;
+	}
+
+	PrintInd(e, fi, data);
+	
+	fclose(fi);
+}
+void Option10(EFILE *e, DATASTYLE *data){
+	char in[TAMS];
+	char out[TAMS];
+	FILE *fi, *fo1;
+
+	Msg( e, 9);
+	scanf("%s", in);
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return NULL;
+	}
+
+	Msg( e, 10);
+	scanf("%s", out);
+	fo1 = fopen(out, "w");
+	if(fo1==NULL){
+		Msg( e, 11);
+		fclose(fi);
+		return NULL;
+	}
+
+	//-----------------
+
+	MakeInd(e, fi, fo1, data);
+	Ordena(out, out);
+
+	fclose(fi);
+	fclose(fo1);
+
+}
 void Option11(){}
 void Option12(){}
 
