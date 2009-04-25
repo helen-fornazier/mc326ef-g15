@@ -98,7 +98,7 @@ int main(int argc, char *argv[]){
 			break;
 
 		case 12:
-			Option12(e, data);
+			Option12(e, dataind, data);
 			break;
 			
 		case 13:

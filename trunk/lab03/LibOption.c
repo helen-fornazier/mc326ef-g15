@@ -315,6 +315,11 @@ DATASTYLE *WriteIndData(EFILE *e, DATASTYLE *data){
 	dataind->efield[2] = data->efield[data->nfield-1];
 
 	FILE* fn = fopen(DATAINDN, "r");
+	if(fn==NULL){
+		Msg( e, 30);
+		fclose(find);
+		return NULL;
+	}
 	MakeDataS(fn, &(dataind->fieldname), dataind->nfield);
 	fclose(fn);
 	
@@ -407,6 +412,27 @@ void Ordena(char *in, char *out){
 	
 }
 
+
+char* VerificaRepitidoOrdenado(FILE *f){
+	char vet1[TAMS]="chuchu", vet2[TAMS]="brogis";
+	char *ret=NULL;
+	while(!feof(f)){
+		if(fread(vet1,sizeof(char),6,f)<6) break;
+		if(!strcmp(vet1,vet2)){
+			ret=strdup(vet1);
+			break;
+		}
+		if(fseek(f,sizeof(long int)+3,SEEK_CUR)) break;
+		if(fread(vet2,sizeof(char),6,f)<6) break;
+		if(!strcmp(vet1,vet2)){
+			ret=strdup(vet1);
+			break;
+		}
+		fseek(f,sizeof(long int)+3,SEEK_CUR);
+	}
+	return ret;
+}
+
 void Option7(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
 	char out[TAMS];
@@ -420,6 +446,15 @@ void Option7(EFILE *e, DATASTYLE *data){
 	//-----------
 
 	Ordena(in, out);
+
+	FILE *f=fopen(out,"r");
+	char *ret=VerificaRepitidoOrdenado(f);
+	if(ret!=NULL){
+		Msg(e,31);
+		printf("%s\n",ret);
+		free(ret);
+	}
+	fclose(f);
 
 }
 
@@ -601,33 +636,33 @@ void Option12(EFILE *e, DATASTYLE *config){
 
 
 
-void Option11(EFILE e, DATASTYLE *search, DATASTYLE *find){
-	char sname[100], fname[100], key[50];
-	FILE *fs, *ff;
+void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find){
+	char sname[TAMS], fname[TAMS], key[TMS];
+	FILE *sf, *ff;
 	int i;
-	char **register;
+	char **rregister;
 
-	msg(e,20);
+	Msg(e,20);
 	scanf("%s",sname);
-	fs=fopen(sname,"r");
-	if(fs==NULL){
-		msg(e,11);
+	sf=fopen(sname,"r");
+	if(sf==NULL){
+		Msg(e,11);
 		return;
 	}
-	msg(e,21);
+	Msg(e,21);
 	scanf("%s",fname);
 	ff=fopen(fname,"r");
 	if(ff==NULL){
-		fclose(fs);
-		msg(e,11);
+		fclose(sf);
+		Msg(e,11);
 		return;
 	}
-	msg(e,13);
+	Msg(e,13);
 	scanf("%s",key);
 
 	i=BinaryKeySearch(sf,ff,search,find,key);
 	if(!i){
-		msg(e,15);
+		Msg(e,15);
 	}
 	
 			ReadRegVar(ff,&rregister,find->nfield);
@@ -638,38 +673,53 @@ void Option11(EFILE e, DATASTYLE *search, DATASTYLE *find){
 
 			if(rregister[0][0]=='n'){
 					
-				msg(e,15);
+				Msg(e,15);
 			}
-			FreeT(register,find->nfield);	
+			FreeT(rregister,find->nfield);	
 
-	fclose(fs);
+	fclose(sf);
 	fclose(ff);
 }
 
 
-void Option12(EFILE e, DATASTYLE config){
-char fname[100], key[50];
-int i;
+void Option12(EFILE *e, DATASTYLE *search, DATASTYLE *find){
+	char sname[TAMS], fname[TAMS], *key=(char*)malloc(sizeof(char)*50);
+	FILE *sf, *ff;
+	int i;
 
-	msg(e,9);
-	scanf("%s",fname);
-	f=fopen(sname,"r");
-	if(f==NULL){
-		msg(e,11);
+	Msg(e,20);
+	scanf("%s",sname);
+	sf=fopen(sname,"r");
+	if(sf==NULL){
+		Msg(e,11);
+		free(key);
 		return;
 	}
-	
-	msg(e,22);
+	Msg(e,21);
+	scanf("%s",fname);
+	ff=fopen(fname,"r+");
+	if(ff==NULL){
+		fclose(sf);
+		Msg(e,11);
+		free(key);
+		return;
+	}
+	Msg(e,13);
 	scanf("%s",key);
 
-	i=EraseReg(f,key,config->nfield);
+
+
+	i=EraseReg(sf,ff,search,find,key);
 	if(i){
-		msg(e,23);
+		Msg(e,23);
 	}
 	else{
-		msg(e,15);
+		Msg(e,15);
 	}
-	fclose(f);
+	
+	free(key);
+	fclose(sf);
+	fclose(ff);
 }
 
 

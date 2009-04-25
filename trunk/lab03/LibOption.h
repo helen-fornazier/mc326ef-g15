@@ -28,7 +28,7 @@ DATASTYLE *Option10(EFILE *e, DATASTYLE *data);
 
 void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find);
 
-void Option12(EFILE *e, DATASTYLE *config);
+void Option12(EFILE *e, DATASTYLE *search, DATASTYLE *find);
 
 /*Transforms a file fix to variable one
  * Returns 0 if the file fix does not according with
