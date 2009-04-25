@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include "LibFile.h"
 #include "LibWord.h"
+#include "LibOption.h"
+#include "LibMsg.h"
 
 #ifndef EOS
 #define EOS '\0'
@@ -23,6 +25,7 @@ int MakeData(FILE *f, int **tab, int *nfields){
 	for(i=0;i<*nfields;i++){
 		if(fscanf(f,"%d",&((*tab)[i])) == EOF){
 			free(*tab);
+			(*tab)=NULL;
 			return 0;
 		}
 	}
@@ -302,10 +305,10 @@ int MakeDataS(FILE *f, char ***str, int nfield){
 
 /*Description: Free all data of a struct DATASTYLE data*/
 void CloseDatastyle(DATASTYLE *data){
-	free(data->efield);
-	free(data->ob);
-	free(data->alpha);
-	FreeT(data->fieldname, data->nfield);
+	if(data->efield!=NULL)	free(data->efield);
+	if(data->ob!=NULL)	free(data->ob);
+	if(data->alpha!=NULL)	free(data->alpha);
+	if(data->fieldname)	FreeT(data->fieldname, data->nfield);
 	free(data);
 }
 
@@ -485,42 +488,54 @@ int VerAlnum(char *str){
 
 int EraseReg(FILE *f, char *vet, int nfields){
 	if(SearchKeyVar(f,vet,nfields)){
-		fprintf(f,"n");
-		return 1;
+		fseek(f,2,SEEK_CUR);
+		if(fwrite("n",sizeof(char),1,f)/*fprintf(f,"n")*/) return 1;
 	}
 	return 0;
 }
 
 int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char *key){
 	int regsize, i, signal;
-	long int position, start, end, temp, step1, step2;
+	long int position, start, end, step1, step2;
 	char *reg;
 	char **rregister;
-	
 	reg=(char*)malloc(sizeof(char)*(search->efield[0]));
 	
 	start=0;
-	fseek(fs,0,SEEK_END);
-	end=ftell(fs);
-	fseek(fs,0,SEEK_SET);
+	fseek(sf,0,SEEK_END);
+	end=ftell(sf);
+	fseek(sf,0,SEEK_SET);
 	
+	printf("end %ld\n",end);
+
 	regsize=0;
 	for(i=0;i<search->nfield;i++)
-		regsize+=(search->efield[i]+1);
+		regsize+=(search->efield[i]);
+	regsize++;
+
+	printf("regsize %d\n",regsize);
+	
 	signal=1;
 	step1=end/regsize;
 	step2=2;
+	
+	printf("step1 %ld\n",step1);
 
-	while(step2==1){
-		step2=step1
-		step1=step1/2;
+	while(step2!=1){
+		step2=step1;
+		step1=step1%2+step1/2;
 		if(!step1) step1=1;
-		fseek(fs,step1*regsize*signal,SEEK_CUR);
-		fscanf(fs,"%s",reg);
+		fseek(sf,step1*regsize*signal,SEEK_CUR);
+		fscanf(sf,"%s",reg);
+		
+		printf("key %s\n",reg);
+		
 		signal=strcmp(key,reg);
 		if(!signal){
-			fscanf(sf,"%ld",position);
-			fseek(ff,postion,SEEK_SET);
+			fseek(sf,1,SEEK_CUR);
+			fread(&position,sizeof(long int),1,sf);
+
+			fseek(ff,position,SEEK_SET);
 			ReadRegVar(ff,&rregister,find->nfield);
 			if(rregister[0][0]=='s'){
 				PrintOne(find,rregister,1);
@@ -533,7 +548,7 @@ int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char
 			FreeT(rregister,find->nfield);
 			return 1;
 		}
-		fseek(fs,-(search->efield[0]-1),SEEK_CUR);
+		fseek(sf,-(search->efield[0]-1),SEEK_CUR);
 		if(signal>0) signal=1;
 		else signal=-1;
 	}

@@ -5,6 +5,8 @@
 #include <string.h>
 #include <ctype.h>
 #include "LibWord.h"
+//#include "LibOption.h"
+#include "LibMsg.h"
 
 #ifndef EOS
 #define EOS '\0'
@@ -208,5 +210,8 @@ int VerAlnum(char *str);
 int EraseReg(FILE *f, char *vet, int nfields);
 
 int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char *key);
+
+
+int MakeDataS(FILE *f, char ***str, int nfield);
 
 #endif  /*LIB_FILE*/

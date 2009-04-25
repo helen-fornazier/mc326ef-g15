@@ -33,12 +33,20 @@ int main(int argc, char *argv[]){
 	
 	DATASTYLE *dataind = NULL;
 	FILE *find = fopen(DATAIND, "r");		//file of configuration
-	FILE *findn = fopen(DATAN, "r");
-	if(find != NULL){
+	FILE *findn;
+	if(find!=NULL){
 		dataind = FillData(find);
-		MakeDataS(findn, &(dataind->fieldname), dataind->nfield);
+		findn= fopen(DATAN, "r");
+		if(findn!=NULL){
+			MakeDataS(findn, &(dataind->fieldname), dataind->nfield);
+			fclose(findn);
+		}
+		else{
+			dataind->fieldname = InitRegis(dataind->nfield);
+			Msg( e, 19);
+		}
+		fclose(find);
 	}
-	fclose(find);
 
 
 
@@ -78,16 +86,37 @@ int main(int argc, char *argv[]){
 			Option9(e, dataind);
 			break;
 
+		case 10:
+			dataind = Option10(e, data);	break;
+			
+		case 11:
+			if(dataind == NULL){
+				Msg( e, 19);
+				break;
+			}
+			Option11(e, dataind, data);
+			break;
+
+		case 12:
+			Option12(e, data);
+			break;
+			
 		case 13:
 			op = 0;		break;
 		default:
-			Msg(e, 7);
+			Msg(e, 7);	break;
+		
+
+		case 14:
+			PrintMenu(e);	break;
+
 		}
 	}
 
 
-	CloseDatastyle(data);
-	CloseMsg(e);
+	if(data!=NULL)	CloseDatastyle(data);
+	if(dataind!=NULL)	CloseDatastyle(dataind);
+	if(e!=NULL)	CloseMsg(e);
 
 	return 0;
 }

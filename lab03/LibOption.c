@@ -5,7 +5,7 @@
 #include"LibWord.h"
 #include"LibFile.h"
 #include"LibMsg.h"
-#include "LibOption.h"
+#include"LibOption.h"
 
 #define TAMS 100
 #define TMS 30
@@ -22,7 +22,14 @@ void PrintMenu(EFILE *e){
 	Msg( e, 3);
 	Msg( e, 4);
 	Msg( e, 5);
+	Msg( e, 24);
+	Msg( e, 25);
+	Msg( e, 26);
+	Msg( e, 27);
+	Msg( e, 28);
+	Msg( e, 29);
 	Msg( e, 6);
+
 	}
 
 void VerOb(EFILE *e, DATASTYLE *data, REGIS matrix,  int i, int j){
@@ -160,7 +167,6 @@ int  Option1(EFILE *e, DATASTYLE *data){
 
 void Printfix(EFILE *e, FILE *fi, DATASTYLE *data){
 	char **str = NULL;
-	int i = 0;
 
 	while(1){
 		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) break;
@@ -251,12 +257,8 @@ void Option3(EFILE *e, DATASTYLE *data){
 }
 
 
-void SearchandPrint(EFILE *e, FILE *fi, DATASTYLE *data){
-	int i=0;
+void SearchandPrint(EFILE *e, FILE *fi, DATASTYLE *data, char *key){
 	char **str;
-	char key[TAMS];
-	Msg( e, 13);
-	scanf("%s", key);
 
 
 	if(SearchKeyVar(fi, key,data->nfield)){
@@ -284,7 +286,10 @@ void Option4(EFILE *e, DATASTYLE *data){
 	}
 	
 //----------------
-	SearchandPrint(e, fi, data);
+	char key[TAMS];
+	Msg( e, 13);
+	scanf("%s", key);
+	SearchandPrint(e, fi, data, key);
 	
 	fclose(fi);
 }
@@ -323,7 +328,7 @@ int MakeOneInd(EFILE *e, FILE *fi, FILE *fo1, DATASTYLE *data){
 	long int start;
 	char **vet;
 
-	if(start=ReadRegVar(fi,&vet,data->nfield)){
+	if((start=ReadRegVar(fi,&vet,data->nfield))){
 		if(vet[0][0]=='s'){
 			fprintf(fo1,"%s ",vet[1]);
 			start = start-1;
@@ -422,14 +427,15 @@ void Option7(EFILE *e, DATASTYLE *data){
 int PrintOneInd(EFILE *e, FILE *fi,  DATASTYLE *data){
 	char **str = NULL;
 	int i = 0;
-	long int *ld=NULL;
+	long int *ld = NULL;
 
-		if(!ReadRegFix3(fi, &str, data->efield, data->nfield)) return 0;
+		if(!ReadRegFix2(fi, &str, data->efield, data->nfield)) return 0;
 		
 		
 		for(i=0; i<data->nfield -1 ; i++){
 			if(i==1){
-				ld=(long int)str[i];
+				ld=(long int*)str[i];
+//				fread(ld,sizeof(long int),1,str[1]);
 				printf("%s = %ld |", data->fieldname[i], (*ld));
 			}
 			else printf("%s = %s |", data->fieldname[i], str[i]);
@@ -443,9 +449,9 @@ int PrintOneInd(EFILE *e, FILE *fi,  DATASTYLE *data){
 	
 
 
-int PrintInd(EFILE *e, FILE *fi, DATASTYLE *data){
+void PrintInd(EFILE *e, FILE *fi, DATASTYLE *data){
 	while(PrintOneInd(e, fi, data));
-
+	
 }
 
 //Já supondo que dataind != null
@@ -469,7 +475,7 @@ void Option8(EFILE *e, DATASTYLE *data){
 }
 void Option9(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
-	FILE *fi, *fo1;
+	FILE *fi;
 
 	Msg( e, 9);
 	scanf("%s", in);
@@ -477,14 +483,15 @@ void Option9(EFILE *e, DATASTYLE *data){
 	fi = fopen(in, "r");
 	if(fi == NULL){
 		Msg(e, 11);
-		return NULL;
+		return;
 	}
 
 	PrintInd(e, fi, data);
 	
 	fclose(fi);
 }
-void Option10(EFILE *e, DATASTYLE *data){
+
+DATASTYLE *Option10(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
 	char out[TAMS];
 	FILE *fi, *fo1;
@@ -509,67 +516,77 @@ void Option10(EFILE *e, DATASTYLE *data){
 	//-----------------
 
 	MakeInd(e, fi, fo1, data);
-	Ordena(out, out);
 
 	fclose(fi);
 	fclose(fo1);
 
+	DATASTYLE *dataind = NULL;
+	dataind = WriteIndData(e, data);
+
+	if( dataind == NULL){
+		Msg( e, 18);
+		return NULL;
+	}
+
+	Ordena(out, out);
+	return dataind;
+
 }
 
 
-void Option11(EFILE e, DATASTYLE *search, DATASTYLE *find){
-	char sname[100], fname[100], key[50];
-	FILE *fs, *ff;
+void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find){
+	char sname[TAMS], fname[TAMS], key[TMS];
+	FILE *sf, *ff;
 	int i;
 
-	msg(e,20);
+	Msg(e,20);
 	scanf("%s",sname);
-	fs=fopen(sname,"r");
-	if(fs==NULL){
-		msg(e,11);
+	sf=fopen(sname,"r");
+	if(sf==NULL){
+		Msg(e,11);
 		return;
 	}
-	msg(e,21);
+	Msg(e,21);
 	scanf("%s",fname);
 	ff=fopen(fname,"r");
 	if(ff==NULL){
-		fclose(fs);
-		msg(e,11);
+		fclose(sf);
+		Msg(e,11);
 		return;
 	}
-	msg(e,13);
+	Msg(e,13);
 	scanf("%s",key);
 
 	i=BinaryKeySearch(sf,ff,search,find,key);
 	if(!i){
-		msg(e,15);
+		Msg(e,15);
 	}
-	fclose(fs);
+	fclose(sf);
 	fclose(ff);
 }
 
 
-void Option12(EFILE e, DATASTYLE config){
-char fname[100], key[50];
-int i;
+void Option12(EFILE *e, DATASTYLE *config){
+	char fname[TAMS], key[TMS];
+	int i;
 
-	msg(e,9);
+	Msg(e,9);
 	scanf("%s",fname);
-	f=fopen(sname,"r");
+	FILE *f=fopen(fname,"r+");
 	if(f==NULL){
-		msg(e,11);
+		Msg(e,11);
 		return;
 	}
 	
-	msg(e,22);
+	Msg(e,22);
 	scanf("%s",key);
 
 	i=EraseReg(f,key,config->nfield);
 	if(i){
-		msg(e,23);
+		Msg(e,23);
 	}
 	else{
-		msg(e,15);
+		Msg(e,15);
 	}
 	fclose(f);
 }
