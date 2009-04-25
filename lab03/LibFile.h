@@ -207,7 +207,7 @@ int VerAlnum(char *str);
  * wants to be logicaly removed.
  * Returns 0 if the key is not found
  * and 1 if it is deleted*/
-int EraseReg(FILE *f, char *vet, int nfields);
+int EraseReg(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char *key);
 
 /* entry:
  * sf-> menu file where the key will be searched
