@@ -209,6 +209,12 @@ int VerAlnum(char *str);
  * and 1 if it is deleted*/
 int EraseReg(FILE *f, char *vet, int nfields);
 
+/* entry:
+ * sf-> menu file where the key will be searched
+ * ff-> file where the register will be stracted
+ * search-> structure of sf
+ * find-> structure of ff
+ * the function will return 1 if it has been sucssesfull or 0 if not */
 int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char *key);
 
 

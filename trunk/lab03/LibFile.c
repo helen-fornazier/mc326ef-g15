@@ -485,9 +485,10 @@ int VerAlnum(char *str){
 
 	return 0;
 }
-
-int EraseReg(FILE *f, char *vet, int nfields){
-	if(SearchKeyVar(f,vet,nfields)){
+/*
+int EraseReg(FILE *ff, char *key, DATASTYLE *find, DATASTYLE *search, FILE *sf){
+	if(BinaryKeySearch(sf,ff,search,find,key)){
+		fseek(ff,2,SEEK_CUR);
 		fseek(f,2,SEEK_CUR);
 		if(fwrite("n",sizeof(char),1,f)/*fprintf(f,"n")*/) return 1;
 	}
@@ -498,7 +499,6 @@ int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char
 	int regsize, i, signal;
 	long int position, start, end, step1, step2;
 	char *reg;
-	char **rregister;
 	reg=(char*)malloc(sizeof(char)*(search->efield[0]));
 	
 	start=0;
@@ -536,16 +536,7 @@ int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char
 			fread(&position,sizeof(long int),1,sf);
 
 			fseek(ff,position,SEEK_SET);
-			ReadRegVar(ff,&rregister,find->nfield);
-			if(rregister[0][0]=='s'){
-				PrintOne(find,rregister,1);
-			}
 			free(reg);
-			if(rregister[0][0]=='n'){
-				FreeT(rregister,find->nfield);	
-				return 0;
-			}
-			FreeT(rregister,find->nfield);
 			return 1;
 		}
 		fseek(sf,-(search->efield[0]-1),SEEK_CUR);
@@ -556,4 +547,4 @@ int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char
 	free(reg);
 	return 0;
 }
-
+*/
