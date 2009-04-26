@@ -161,7 +161,8 @@ int ReadStr( FILE* f, char **str, int len){
     if(ver == len) (*str)[len] = EOS;
 
     else{
-        (*str)[ver-1] = EOS;  //ver-1 pois se ele não leu o que mandei ler,  quer dizer que ele encontrou o EOF, e se encontrou o EOF, antes dele possui o \n
+		if(ver==0)	(*str)[ver] = EOS; 
+		else (*str)[ver-1] = EOS;  //ver-1 pois se ele não leu o que mandei ler,  quer dizer que ele encontrou o EOF, e se encontrou o EOF, antes dele possui o \n
         (*str) = realloc(*str, sizeof(char)*(ver));
         if(*str == NULL) return 0;
     }
@@ -224,7 +225,8 @@ DATASTYLE *InitDatastyle(){
 	data->efield = NULL;
 	data->ob = NULL;
 	data->fieldname = NULL;
-	
+	data->alpha = NULL;
+
 	return data;
 
 }
@@ -308,8 +310,8 @@ void CloseDatastyle(DATASTYLE *data){
 	if(data->efield!=NULL)	free(data->efield);
 	if(data->ob!=NULL)	free(data->ob);
 	if(data->alpha!=NULL)	free(data->alpha);
-	if(data->fieldname)	FreeT(data->fieldname, data->nfield);
-	free(data);
+	if(data->fieldname!=NULL)	FreeT(data->fieldname, data->nfield);
+	if(data!=NULL)	free(data);
 }
 
 

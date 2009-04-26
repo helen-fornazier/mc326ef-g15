@@ -18,13 +18,13 @@ void Option4(EFILE *e, DATASTYLE *data);
 
 DATASTYLE *Option6(EFILE *e, DATASTYLE *data);   //Já cria o datainit.config e retorna o datastyle dele
 
-void Option7(EFILE *e, DATASTYLE *data);
+int Option7(EFILE *e, DATASTYLE *data);
 
 void Option8(EFILE *e, DATASTYLE *data);
 
 void Option9(EFILE *e, DATASTYLE *data);
 
-DATASTYLE *Option10(EFILE *e, DATASTYLE *data);
+DATASTYLE *Option10(EFILE *e, DATASTYLE *data, int *op);
 
 void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find);
 
@@ -71,5 +71,9 @@ int PrintOneInd(EFILE *e, FILE *fi,  DATASTYLE *data);
 /*Prints in the stdout all of index register, its a loop of
  * the finction PrintOneInd*/
 void PrintInd(EFILE *e, FILE *fi, DATASTYLE *data);
+
+/*Returns NULL if doesn'n exist repeted primary key in index file f
+ * or Returns the key repeted*/
+char* VerificaRepitidoOrdenado(FILE *f);
 
 #endif    //LIB_OPT

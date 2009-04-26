@@ -18,4 +18,3 @@ s039482 Joao                                            23232322 F 17#
 s012323 Carmen Miranda          Brasilia                         F 97#
 s048293 Sand Saraf              Poorcity                         F 69#
 s036462 Hiro Nakamura           japao                              42#
-s039482 Amelia                  inferno                            66#
