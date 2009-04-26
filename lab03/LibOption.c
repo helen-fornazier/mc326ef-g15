@@ -308,6 +308,8 @@ DATASTYLE *WriteIndData(EFILE *e, DATASTYLE *data){
 	dataind->nfield = TAMIND;
 	fprintf(find, "%d %d %d\n", data->efield[1], sizeof(long int), data->efield[data->nfield-1]);
 
+	if(dataind->efield!=NULL)	free(dataind->efield);
+
 	dataind->efield = (int*) malloc(sizeof(int) * TAMIND);
 
 	dataind->efield[0] = data->efield[1];
@@ -320,10 +322,12 @@ DATASTYLE *WriteIndData(EFILE *e, DATASTYLE *data){
 		fclose(find);
 		return NULL;
 	}
+	if(dataind->fieldname!=NULL){
+		FreeT(dataind->fieldname, dataind->nfield);
+	}
 	MakeDataS(fn, &(dataind->fieldname), dataind->nfield);
-	fclose(fn);
 	
-
+	fclose(fn);
 	fclose(find);
 	
 	return dataind;
@@ -433,15 +437,32 @@ char* VerificaRepitidoOrdenado(FILE *f){
 	return ret;
 }
 
-void Option7(EFILE *e, DATASTYLE *data){
+int Option7(EFILE *e, DATASTYLE *data){
 	char in[TAMS];
 	char out[TAMS];
 
 	Msg( e, 9);
 	scanf("%s", in);
 
+	FILE *fi=NULL;
+	fi = fopen(in, "r");
+	if(fi == NULL){
+		Msg(e, 11);
+		return 1;
+	}
+	fclose(fi);
+
 	Msg( e, 10);
 	scanf("%s", out);
+
+	FILE *fo1=NULL;
+	fo1 = fopen(out, "r");
+	if(fo1 == NULL){
+		Msg(e, 11);
+		return 1;
+	}
+	fclose(fo1);
+
 
 	//-----------
 
@@ -453,9 +474,11 @@ void Option7(EFILE *e, DATASTYLE *data){
 		Msg(e,31);
 		printf("%s\n",ret);
 		free(ret);
+		fclose(f);
+		return 0;
 	}
 	fclose(f);
-
+	return 1;
 }
 
 
@@ -526,7 +549,7 @@ void Option9(EFILE *e, DATASTYLE *data){
 	fclose(fi);
 }
 
-DATASTYLE *Option10(EFILE *e, DATASTYLE *data){
+DATASTYLE *Option10(EFILE *e, DATASTYLE *data, int *op){
 	char in[TAMS];
 	char out[TAMS];
 	FILE *fi, *fo1;
@@ -564,76 +587,25 @@ DATASTYLE *Option10(EFILE *e, DATASTYLE *data){
 	}
 
 	Ordena(out, out);
+
+//-------
+
+	FILE *f=fopen(out,"r");
+	char *ret=VerificaRepitidoOrdenado(f);
+	if(ret!=NULL){
+		Msg(e,31);
+		printf("%s\n",ret);
+		fclose(f);
+		free(ret);
+		*op=0;
+	}
+	else{
+		fclose(f);
+	}
+
 	return dataind;
 
 }
-
-
-
-
-
-
-/******************
-
-void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find){
-	char sname[TAMS], fname[TAMS], key[TMS];
-	FILE *sf, *ff;
-	int i;
-
-	Msg(e,20);
-	scanf("%s",sname);
-	sf=fopen(sname,"r");
-	if(sf==NULL){
-		Msg(e,11);
-		return;
-	}
-	Msg(e,21);
-	scanf("%s",fname);
-	ff=fopen(fname,"r");
-	if(ff==NULL){
-		fclose(sf);
-		Msg(e,11);
-		return;
-	}
-	Msg(e,13);
-	scanf("%s",key);
-
-	i=BinaryKeySearch(sf,ff,search,find,key);
-	if(!i){
-		Msg(e,15);
-	}
-	fclose(sf);
-	fclose(ff);
-}
-
-
-void Option12(EFILE *e, DATASTYLE *config){
-	char fname[TAMS], key[TMS];
-	int i;
-
-	Msg(e,9);
-	scanf("%s",fname);
-	FILE *f=fopen(fname,"r+");
-	if(f==NULL){
-		Msg(e,11);
-		return;
-	}
-	
-	Msg(e,22);
-	scanf("%s",key);
-
-	i=EraseReg(f,key,config->nfield);
-	if(i){
-		Msg(e,23);
-	}
-	else{
-		Msg(e,15);
-	}
-	fclose(f);
-}
-
-******************/
-
 
 
 void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find){
@@ -664,7 +636,7 @@ void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find){
 	if(!i){
 		Msg(e,15);
 	}
-	
+	else{	
 			ReadRegVar(ff,&rregister,find->nfield);
 			if(rregister[0][0]=='s'){
 				PrintOne(find,rregister,1);
@@ -676,7 +648,7 @@ void Option11(EFILE *e, DATASTYLE *search, DATASTYLE *find){
 				Msg(e,15);
 			}
 			FreeT(rregister,find->nfield);	
-
+	}
 	fclose(sf);
 	fclose(ff);
 }
@@ -704,7 +676,7 @@ void Option12(EFILE *e, DATASTYLE *search, DATASTYLE *find){
 		free(key);
 		return;
 	}
-	Msg(e,13);
+	Msg(e,22);
 	scanf("%s",key);
 
 

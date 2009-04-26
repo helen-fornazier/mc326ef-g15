@@ -35,13 +35,20 @@ char* Corrector(char *str){
     if(str==NULL) return NULL;
 
     int i, spaces=0;
+	char *strout = NULL;
+
     if(str[0]==SPACE) spaces++;
     for(i=0;str[i]!=EOS;i++) //Conta os espacos sobrando
-        if((str[i]==SPACE&&str[i+1]==SPACE) || (str[i]==SPACE&&str[i+1]==EOS)) spaces++;
-
+        if((str[i]==SPACE&&str[i+1]==SPACE) || (str[i]==SPACE&&str[i+1]==EOS)) 
+			spaces++;
+	if(spaces>strlen(str)) spaces--;  //caso onde a string for toda de espaços
     if(spaces){ //Se existe espaco sobrando
-        char *strout=(char*)malloc(sizeof(char)*(strlen(str)-spaces+1)); //Malloca no tamanho certo, sem os espacos sobrando
+        
+		strout=(char*)malloc(sizeof(char)*(strlen(str)-spaces+1)); //Malloca no tamanho certo, sem os espacos sobrando
         if(strout==NULL) return NULL; //Retorna NULL se houver erro de memória
+		
+		
+		
 
         int j=0;
         for(i=0;str[i]!=EOS;i++){
