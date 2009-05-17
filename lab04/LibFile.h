@@ -220,4 +220,44 @@ int BinaryKeySearch(FILE *sf, FILE *ff, DATASTYLE *search, DATASTYLE *find, char
 /*Reads of FILE f nfields words em put in char **str*/
 int MakeDataS(FILE *f, char ***str, int nfield);
 
+
+/*Sorts a table of registers with i = position of the first register,
+ * j = position of last register, ver is the table of registers and field
+ * is the field of the register that will be Sorted by*/
+void quickSort(int i, int j, REGIS vet, int field);
+
+
+/*Reads in a big vector nregis from f and put in char *str
+ *
+ *char **str is the addres of a char *str
+ *
+ * len is the lenght of a register
+ *
+ * Returns the number of registers readed
+ *
+ * if it could not read nregis registers, it realocs the string
+ * str with integers register with \n in the end*/
+int Read(FILE *f, char **str, int len, int nregis);
+
+/*Description: reads len characteres in string scan and puts in the string str
+ *
+ * This function already allocate memory for str
+ *
+ *Returns the number of characteres readed
+ *Returns 0 if does not readed something or memory error
+ **/
+int ReadStr2( char *scan, char* *str, int len);
+
+/*FALTA COLOCAR UNS AVISOS*/
+/*
+ * scan is the string that will be readed.
+ * fieldList is a (char **) type that will be filled whith strings.
+ * lenList[i] indicate the number of characteres that will be readed from
+ * the string scan and put in fieldList[i]
+ *
+ * Returns the number of all characteres readed
+ * If does not readed the right number of characteres scan, returns 0 
+ * */
+int FillFields2(char *scan, char* **fieldList, int *lenList, int nfields);
+
 #endif  /*LIB_FILE*/
