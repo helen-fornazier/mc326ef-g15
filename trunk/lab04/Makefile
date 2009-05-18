@@ -4,10 +4,10 @@ OBJS = LibWord.o LibFile.o LibMsg.o LibOption.o
 LIBS = LibWord.c LibFile.c LibMsg.c LibOption.c
 
 
-lab04: $(LIBS) $(OBJS) hteste.o hteste.c
+lab04: $(LIBS) $(OBJS) lab04.o lab04.c
 	$(CC) $(CFLAGS) $(LIBS)
-	$(CC) $(CFLAGS) hteste.c
-	$(CC) -o hteste hteste.o $(OBJS)
+	$(CC) $(CFLAGS) lab04.c
+	$(CC) -o lab04 lab04.o $(OBJS)
 
 
 clean:
