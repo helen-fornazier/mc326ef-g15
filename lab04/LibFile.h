@@ -14,6 +14,8 @@
 
 #define PRINT_TAM 1
 #define PRINT_DIV 0
+#define TAMS 100
+#define TMS 10
 
 typedef char*** REGIS;
 
@@ -271,5 +273,17 @@ int FillFields2(char *scan, char* **fieldList, int *lenList, int nfields);
  * Creates a new one if the file does not exist
  * */
 void WriteLin(char *filename, ITENS item);
+
+/*Reads f and fill REGIS reg, */
+int Div(FILE *f ,REGIS *reg,  int *vlen, int nfield, int qtd);
+
+
+/*Converts a table REGIS to a string str
+ *
+ * nregist is the number of the registers that will be copy
+ * tamregis is the number of the register
+ * nfield is the quantity of field that contain in a registers*/
+int TabletoStr(char* *str, REGIS reg, int nregis, int tamregis, int nfield);
+
 
 #endif  /*LIB_FILE*/
