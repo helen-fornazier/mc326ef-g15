@@ -19,4 +19,4 @@ all:
 	make lab04
 
 valgrind:
-	valgrind --tool=memcheck --leak-check=yes --leak-check=full --show-reachable=yes ./lab04
+	valgrind --tool=memcheck --leak-check=yes --leak-check=full --show-reachable=yes ./lab04 listafinal.txt o1.out 2000
