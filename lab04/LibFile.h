@@ -285,5 +285,11 @@ int Div(FILE *f ,REGIS *reg,  int *vlen, int nfield, int qtd);
  * nfield is the quantity of field that contain in a registers*/
 int TabletoStr(char* *str, REGIS reg, int nregis, int tamregis, int nfield);
 
+/*Loads the names of the file csv.config*/
+ITENS CarregaCsv(char *filename, int nitens);
+
+/*Same as WriteLin, but if the filename does not exist,
+ * it writes the name of the colums*/
+void WriteCsv(char *filename, ITENS item, char *csvconfig);
 
 #endif  /*LIB_FILE*/
