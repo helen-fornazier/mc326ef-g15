@@ -579,7 +579,7 @@ void quickSort(int i, int j, REGIS vet, int field){
 
 
 
-/*Reads in a big vector nregis from f and put in char *str
+/*Reads to a big vector nregis from f and put in char *str
  *
  *char **str is the addres of a char *str
  *
@@ -670,7 +670,13 @@ int FillFields2(char *scan, char* **fieldList, int *lenList, int nfields){
 }
 
 
-/*Reads f and fill REGIS reg, */
+/*Reads f and fill REGIS reg 
+ * 
+ * vlen[i] contain the lenght of the field i
+ * qnt is the quantity of registers tha will be readed
+ * nfield is the quantity of the fields in the register
+ *
+ * */
 int Div(FILE *f ,REGIS *reg,  int *vlen, int nfield, int qtd){
 	int len = 0;
 	int i = 0;
@@ -751,7 +757,8 @@ void WriteLin(char *filename, ITENS item){
 		len+=strlen(item.linha[i]);
 	}
 	
-	char *str = (char*)malloc( sizeof(char)*( len + item.nitens - 1 ) ) ;
+	if(len + item.nitens<= 0)	printf("ERROOOOOOOOOOO\n");
+	char *str = (char*)malloc( sizeof(char)*( len + item.nitens + 1) ) ;
 	if(str == NULL) {perror("Error: In malloc of the function WriteLin\n");		return;}
 
 	char *straux = str;
@@ -774,4 +781,55 @@ void WriteLin(char *filename, ITENS item){
 
 
 }
+
+
+/*Loads the names of the file csv.config*/
+ITENS CarregaCsv(char *filename, int nitens){
+
+	FILE *f = fopen(filename, "r");
+	if(f==NULL){	printf("Error: to open file in function CarrecaCsv\n");	exit(0);}
+	
+	ITENS it;
+	int i=0;
+	int j=0;
+	
+	it.linha = (char**)malloc(sizeof(char*)*nitens);
+	it.nitens = nitens;
+
+
+	for(i=0; i<nitens; i++){
+
+		it.linha[i] = (char*)malloc(sizeof(char)*TMS);
+
+		j=fscanf(f, "%s", it.linha[i]);
+		if(j==0)	{perror("Error: in file csvconfig\n");	exit(0);}
+
+		it.linha[i] = (char*)realloc(it.linha[i], strlen(it.linha[i]) +1 );
+
+
+	}
+
+	return it;
+
+}
+
+/*Same as WriteLin, but if the filename does not exist,
+ * it writes the name of the colums*/
+void WriteCsv(char *filename, ITENS item, char *csvconfig){
+	FILE *f = fopen(filename, "r");
+	if(f == NULL){
+		ITENS it = CarregaCsv(csvconfig, item.nitens);
+
+		WriteLin(filename, it);	
+
+		//FreeT(it.linha, it.nitens);
+	
+	}
+	else fclose(f);
+
+	WriteLin(filename, item);
+
+}
+
+
 
