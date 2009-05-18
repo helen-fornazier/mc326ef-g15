@@ -738,3 +738,42 @@ int TabletoStr(char* *str, REGIS reg, int nregis, int tamregis, int nfield){
 }
 
 
+/*Prints in the file filename the table in the struct item
+ *
+ * Opens the file with "a",  writes at the end of the file
+ * Creates a new one if the file does not exist
+ * */
+void WriteLin(char *filename, ITENS item){
+	int i=0;
+	int len = 0;
+
+	FILE *f = fopen(filename, "a");
+
+	for(i=0; i<item.nitens; i++){
+		len+=strlen(item.linha[i]);
+	}
+	
+	char *str = (char*)malloc( sizeof(char)*( len + item.nitens - 1 ) ) ;
+	if(str == NULL) {perror("Error: In malloc of the function WriteLin\n");		return;}
+
+	char *straux = str;
+	
+	for(i=0; i<item.nitens -1 ; i++){				//vai até o penultimo
+		
+		sprintf(straux, "%s,", item.linha[i]);
+
+		straux+=strlen(item.linha[i]) + 1;
+	
+	}
+	
+	sprintf(straux, "%s\n", item.linha[i]);
+
+	fwrite(str, sizeof(char), len + item.nitens, f);
+
+	free(str);
+
+	fclose(f);
+
+
+}
+

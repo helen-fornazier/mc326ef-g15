@@ -39,6 +39,10 @@ typedef struct regis{
 
 } REGIS_t;
 
+typedef struct itens{
+	char **linha;
+	int nitens;
+}	ITENS;
 
 /* Take from a file information about the registers 
  * f-> the file that contains the information in this format:
@@ -259,5 +263,13 @@ int ReadStr2( char *scan, char* *str, int len);
  * If does not readed the right number of characteres scan, returns 0 
  * */
 int FillFields2(char *scan, char* **fieldList, int *lenList, int nfields);
+
+
+/*Prints in the file filename the table in the struct item
+ *
+ * Opens the file with "a",  writes at the end of the file
+ * Creates a new one if the file does not exist
+ * */
+void WriteLin(char *filename, ITENS item);
 
 #endif  /*LIB_FILE*/
