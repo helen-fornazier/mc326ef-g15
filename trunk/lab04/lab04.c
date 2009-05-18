@@ -18,7 +18,7 @@ int FirstOrder(FILE *f, int field, int memory, DATASTYLE *ds, int *totreg){
 	int regsize=0,i;
 	for(i=0;i<ds->nfield;i++) regsize+=ds->efield[i];
 	int nreg=memory/(regsize+1), readreg=nreg, nfile=0;
-	REGIS matrix;
+	REGIS matrix = NULL;
 	char tempstr[TAMS]; 
 	FILE *out;
 	char *str;

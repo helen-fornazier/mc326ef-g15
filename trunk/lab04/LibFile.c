@@ -625,20 +625,11 @@ int ReadStr2( char *scan, char* *str, int len){
     (*str) = (char*)malloc( sizeof(char)*( len+1 ) );
     if( *str==NULL ) return 0;
     
-    int ver = 0;
     (*str) = strncpy(*str, scan, len);
 	
 	(*str)[len] = EOS;
 
-	ver = strlen(*str);
-
-    if(ver<len){
-		(*str)[ver] = EOS;
-
-        (*str) = realloc(*str, sizeof(char)*(ver+1));
-        if(*str == NULL) return 0;
-    }
-    return ver;
+    return strlen(*str);
 }
 
 
@@ -685,7 +676,9 @@ int Div(FILE *f ,REGIS *reg,  int *vlen, int nfield, int qtd){
 	int len = 0;
 	int i = 0;
 
-	
+	(*reg) = (REGIS)malloc( sizeof(char **)*qtd );
+    if((*reg) == NULL)       return 0;	
+
 
 	for(i=0; i<nfield; i++){			//loop que preenche len com o tamanho total de um registro
 		len+=vlen[i];
@@ -712,15 +705,15 @@ int Div(FILE *f ,REGIS *reg,  int *vlen, int nfield, int qtd){
  * nregist is the number of the registers that will be copy
  * tamregis is the number of the register
  * nfield is the quantity of field that contain in a registers*/
-int TabletoStr(char* *str, REGIS reg, int nregis, int tamregis, int nfield){
-	(*str) = (char*)malloc( sizeof(char)*(nregis*(tamregis+1) ));			//maloca nregis* (tamregis+1)     contando com os \n
-
+int TabletoStr(char **str, REGIS reg, int nregis, int tamregis, int nfield){
+	(*str) = (char*)malloc( sizeof(char)*(nregis*(tamregis+1)));			//maloca nregis* (tamregis+1)     contando com os \n
+	if((*str)==NULL) perror("Error: Memory allocation\n");
 
 	int i=0;
 	int j=0;
 	int k=0;
 
-	char *straux = str;
+	char *straux = *str;
 
 	for(i=0; i<nregis; i++){			//loop que anda com os registros
 
@@ -735,7 +728,7 @@ int TabletoStr(char* *str, REGIS reg, int nregis, int tamregis, int nfield){
 			straux+=k;
 		}
 		
-		sprintf(straux, "\n");			//no final do registro coloca \n
+		sprintf(straux, "\n%c", EOS);			//no final do registro coloca \n
 
 		straux++;
 	
@@ -744,6 +737,7 @@ int TabletoStr(char* *str, REGIS reg, int nregis, int tamregis, int nfield){
 	return i;
 
 }
+
 
 
 /*Prints in the file filename the table in the struct item
