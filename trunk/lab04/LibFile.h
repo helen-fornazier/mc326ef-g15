@@ -14,8 +14,6 @@
 
 #define PRINT_TAM 1
 #define PRINT_DIV 0
-#define TAMS 100
-#define TMS 10
 
 typedef char*** REGIS;
 

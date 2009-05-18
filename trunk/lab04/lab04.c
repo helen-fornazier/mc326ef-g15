@@ -4,16 +4,17 @@
 #include"LibWord.h"
 #include"LibMsg.h"
 
-
+#define TAMS 100
+#define TMS 10
 
 
 typedef struct information{
-	int write, read, file, merge;
+	int write, read, file, merge, totreg;
 	double time;
 } INFORMATION;
 
 
-int FirstOrder(FILE *f, int field, int memory, DATASTYLE *ds){
+int FirstOrder(FILE *f, int field, int memory, DATASTYLE *ds, int *totreg){
 	int regsize=0,i;
 	for(i=0;i<ds->nfield;i++) regsize+=ds->efield[i];
 	int nreg=memory/(regsize+1), readreg=nreg, nfile=0;
@@ -21,10 +22,12 @@ int FirstOrder(FILE *f, int field, int memory, DATASTYLE *ds){
 	char tempstr[TAMS]; 
 	FILE *out;
 	char *str;
-	
+	*totreg=0;
+
 	system("mkdir tempfolder");
 	while(readreg==nreg){
 		readreg=Div(f,&matrix,ds->efield,ds->nfield,nreg);
+		*totreg+=readreg;
 		if(readreg==0) break;
 		quickSort(0,nreg-1,matrix,field);
 		nfile++;
@@ -169,32 +172,55 @@ int main(int argc, char *argv[]){
 		return 1;
 	}
 	
-	FILE *f = fopen(DATA,"r");
+	char str[TAMS];
+	sprintf(str,"%s.config",argv[1]);
+	FILE *f = fopen(str,"r");
 	DATASTYLE *data=FillData(f);
 	fclose(f);
 	f=fopen(argv[1],"r");
 	int memory=atoi(argv[3]), temp, field;
 	INFORMATION *info=(INFORMATION*)malloc(sizeof(INFORMATION));
-	char str[TAMS];
+	
 
-	printf("\ndigite 0 se quizer ordenado por RA ou 1 por Nome\n");
+	/**/
 	scanf("%d",&field);
 
 	time_t start,end;
 	time(&start);
 
-	temp=FirstOrder(f,field,memory,data);
+	temp=FirstOrder(f,field,memory,data,&(info->totreg));
 	fclose(f);
 	MergeSort(temp,field,memory,data,info);
 	
 	sprintf(str,"mv tempfolder/%d %s",info->file,argv[2]);
 	system(str);
-	system("rm tempfolder");
+	system("rmdir tempfolder");
 
 	time(&end);
 	info->time=difftime(end,start);
 	info->merge=info->file-temp;
 
+	ITENS itens;
+	itens.nitens=9;
+	itens.linha=(char**)malloc(sizeof(char*)*itens.nitens);
+
+	int i=0;
+	itens.linha[0]=argv[1];
+	for(i=1; i<itens.nitens; i++){
+		itens.linha[i] = (char*)malloc(sizeof(char)*TMS);
+		itens.linha[i][TMS] = EOS;
+	}
+
+	sprintf(itens.linha[1], "%d", info->totreg );
+	sprintf(itens.linha[2], "%d", memory );
+	sprintf(itens.linha[3], "%d", field );
+	sprintf(itens.linha[4], "%d", info->file );
+	sprintf(itens.linha[5], "%d", info->merge );
+	sprintf(itens.linha[6], "%d", info->read );
+	sprintf(itens.linha[7], "%d", info->write );
+	sprintf(itens.linha[8], "%lf", info->time );
+
+	WriteCsv("relatorio.csv", itens, "csv.config");				//ARRUMAR DEFINES PARA OS NOMES DOS ARQUIVOS
 	return 0;
 }
 
