@@ -706,7 +706,7 @@ int Div(FILE *f ,REGIS *reg,  int *vlen, int nfield, int qtd){
  * tamregis is the number of the register
  * nfield is the quantity of field that contain in a registers*/
 int TabletoStr(char **str, REGIS reg, int nregis, int tamregis, int nfield){
-	(*str) = (char*)malloc( sizeof(char)*(nregis*(tamregis+1)));			//maloca nregis* (tamregis+1)     contando com os \n
+	(*str) = (char*)malloc( sizeof(char)*(  (nregis*(tamregis+1)) +1  ));			//maloca nregis* (tamregis+1)  +1 (do \0)   contando com os \n
 	if((*str)==NULL) perror("Error: Memory allocation\n");
 
 	int i=0;
