@@ -16,3 +16,6 @@ clean:
 all:
 	make clean
 	make $(PROG)
+
+valgrind:
+	valgrind --tool=memcheck --leak-check=yes --leak-check=full --show-reachable=yes ./lab02a listafinal.txt o1.out o2.out portugues.config
