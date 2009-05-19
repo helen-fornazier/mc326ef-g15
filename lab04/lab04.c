@@ -7,7 +7,7 @@
 #define TAMS 100
 #define TMS 10
 
-
+ 
 typedef struct information{
 	int write, read, file, merge, totreg;
 	double time;
