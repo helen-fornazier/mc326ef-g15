@@ -42,146 +42,158 @@ int FirstOrder(FILE *f, int field, int memory, DATASTYLE *ds, int *totreg){
 	return nfile;
 }
 
-int MergeSort(int nfile, int field, int memory, DATASTYLE *ds, INFORMATION *info){
-	int regsize=0, i;
-	for(i=0;i<ds->nfield;i++) regsize+=ds->efield[i];
-	int nreg=memory/(3*regsize), nfilea, newfile ;
-	int readrega, readregb, j, k, temp;
-	FILE *a, *b, *c;
-	char tempvet[TAMS];
-	REGIS ra, rb, rc=(REGIS)malloc(sizeof(char**)*nreg);
-	int re=0,wr=0;
-	char *str=NULL;
 
-	if(nfile<=1){ 
-		info->file=nfile;
-		info->write=nfile;
-		info->read=nfile;
-		return 1;
+char** copyReg(char** reg, DATASTYLE *ds){
+	char** out=(char**)malloc(sizeof(char*)*ds->nfield);
+	int i;
+	for(i=0;i<ds->nfield;i++){
+		out[i]=strdup(reg[i]);
 	}
+	return out;
+}
 
+void merge2files(FILE *a, FILE *b, FILE *c, int field, int memory, DATASTYLE *ds, INFORMATION *info){
+	int regsize, nreg, temp, i, j, k, l;
+	int readrega, readregb;
+	REGIS ra, rb, rc;
+	char *str;
+
+	regsize=0;
+	for(i=0;i<ds->nfield;i++) regsize+=ds->efield[i];
+	nreg=memory/(3*regsize);
+
+	readrega=Div(a,&ra,ds->efield,ds->nfield,nreg);
+	info->read++;
+	readregb=Div(b,&rb,ds->efield,ds->nfield,nreg);
+	info->read++;
+	rc=(char***)malloc(sizeof(char**)*nreg);
+	
+	i=j=k=0;
+	while(1){
+		temp=strcmp(ra[i][field],rb[j][field]);
+		if(temp<0){
+			rc[k++]=copyReg(ra[i++],ds);
+			if(i==readrega){
+				FreeTT(ra,readrega,ds->nfield);
+				readrega=Div(a,&ra,ds->efield,ds->nfield,nreg);
+				info->read++;
+				i=0;
+			}
+		}	
+		else{
+			rc[k++]=copyReg(rb[j++],ds);
+			if(j==readregb){
+				FreeTT(rb,readregb,ds->nfield);
+				readregb=Div(b,&rb,ds->efield,ds->nfield,nreg); 
+				info->read++;
+				j=0;
+			}	
+		}
+		if(k==nreg){ 
+			TabletoStr(&str,rc,k,regsize,ds->nfield);
+			fwrite(str,sizeof(char),(regsize+1)*k,c);
+			free(str);
+			for(l=0;l<nreg;l++) FreeT(rc[l],ds->nfield);
+			info->write++;
+			k=0;
+		}	
+		if(feof(a)){
+			TabletoStr(&str,rc,k,regsize,ds->nfield);
+			fwrite(str,sizeof(char),(regsize+1)*k,c);
+			free(str);
+			for(l=0;l<k;l++) FreeT(rc[l],ds->nfield);
+			free(rc);
+			info->write++;
+	
+			TabletoStr(&str,&rb[j],(readregb-j),regsize,ds->nfield);
+			fwrite(str,sizeof(char),(regsize+1)*(readregb-j),c);
+			FreeTT(rb,readregb,ds->nfield);
+			free(str);
+			info->write++;
+			
+			while(!feof(b)){
+				readregb=Read(b,&str,regsize,nreg*3);
+				fwrite(str,sizeof(char),readregb*(regsize+1),c);
+				free(str);
+				info->write++;
+			}
+			break;
+		}	
+		if(feof(b)){
+			TabletoStr(&str,rc,k,regsize,ds->nfield);
+			fwrite(str,sizeof(char),(regsize+1)*k,c);
+			free(str);	
+			for(l=0;l<k;l++) FreeT(rc[l],ds->nfield);
+			free(rc);
+			info->write++;
+	
+			TabletoStr(&str,&ra[j],(readrega-i),regsize,ds->nfield);
+			fwrite(str,sizeof(char),(regsize+1)*(readrega-i),c);
+			FreeTT(ra,readrega,ds->nfield);
+			free(str);
+			info->write++;
+			
+			while(!feof(a)){
+				readrega=Read(a,&str,regsize,nreg*3);
+				fwrite(str,sizeof(char),readrega*(regsize+1),c);
+				free(str);
+				info->write++;
+			}
+			break;
+		}			
+	}
+}
+
+void MergeSort(int nfile, int field, int memory, DATASTYLE *ds, INFORMATION *info){
+	int nfilea, newfile;
+	char tempvet[TAMS];
+	FILE *a, *b, *c;
+
+	info->merge=0;
+	info->write=nfile;
+	info->read=nfile;
+	info->file=nfile;
+
+	if(nfile<2) return;
+	
 	nfilea=1;
+	newfile=nfile+1;
+
 	sprintf(tempvet,"tempfolder/%d",nfilea);
 	a=fopen(tempvet,"r");
 	nfilea++;
 	sprintf(tempvet,"tempfolder/%d",nfilea);
 	b=fopen(tempvet,"r");
-	newfile=nfile+1;
 	sprintf(tempvet,"tempfolder/%d",newfile);
-/**********************************/
-printf("\n\n %d %d \n \n",nfile,nfilea);
-/***********************************/
 	c=fopen(tempvet,"w");
-	readrega=Div(a,&ra,ds->efield,ds->nfield,nreg);
-	re++;
-	readregb=Div(b,&rb,ds->efield,ds->nfield,nreg);
-	re++;
 	
-/***************************************/
-printf("\n\n Dentro do merge, antes do loop \n \n");
-	/**********************************/
+	merge2files(a,b,c,field,memory,ds,info);
+	info->merge++;
+	info->file++;
+	fclose(a);
+	fclose(b);
+	fclose(c);
 	
-	while(1){
-		i=j=k=0;
-		while(1){
-/**********************************/
-printf("teste loop 1\n");
-/***********************************/
-			
-			temp=strcmp(ra[i][field],rb[j][field]);
-			if(temp<0){
-				rc[k++]=ra[i++];
-				if(i==readrega){
-					FreeTT(ra,readrega,ds->nfield);
-					readrega=Div(a,&ra,ds->efield,ds->nfield,nreg);
-					re++;
-					i=0;
-				}
-			}
-			else{
-				rc[k++]=rb[j++];
-				if(j==readregb){ 
-					FreeTT(rb,readregb,ds->nfield);
-					readregb=Div(b,&rb,ds->efield,ds->nfield,nreg); 
-					re++;
-					j=0;
-				}
-			}
-			if(k==nreg){ 
-				TabletoStr(&str,rc,k,regsize,ds->nfield);
-				fwrite(str,sizeof(char),(regsize+1)*k,c);
-				free(str);
-				wr++;
-				k=0;
-			}
-			if(feof(a)){
-				TabletoStr(&str,rc,k,regsize,ds->nfield);
-				fwrite(str,sizeof(char),(regsize+1)*k,c);
-				free(str);
-				wr++;
+	while(nfilea<nfile){
 		
-				TabletoStr(&str,&rb[j],(readregb-j),regsize,ds->nfield);
-				fwrite(str,sizeof(char),(regsize+1)*(readregb-j),c);
-				free(str);
-				wr++;
-				
-				while(!feof(b)){
-					/*le memory em b*/
-					readregb=Read(b,&str,regsize,nreg*3);
-					fwrite(str,sizeof(char),readregb*(regsize+1),c);
-					free(str);
-					wr++;
-				}
-				break;
-			}
-			if(feof(b)){ 
-				TabletoStr(&str,rc,k,regsize,ds->nfield);
-				fwrite(str,sizeof(char),(regsize+1)*k,c);
-				free(str);
-	
-				wr++;
-				TabletoStr(&str,&ra[j],(readrega-i),regsize,ds->nfield);
-				fwrite(str,sizeof(char),(regsize+1)*(readrega-i),c);
-				free(str);
-	
-				wr++;
-				while(!feof(a)){
-					readregb=Read(a,&str,regsize,nreg*3);
-					fwrite(str,sizeof(char),readregb*(regsize+1),c);
-					free(str);
-	
-					wr++;
-				}
-				break;
-			}
-		}
-	
-		fseek(c,0,SEEK_SET);
-		fclose(a);
-		fclose(b);
-		a=c;
+		sprintf(tempvet,"tempfolder/%d",newfile);
+		a=fopen(tempvet,"r");
 		nfilea++;
-		if(nfilea>nfile){ 
-			fclose(c);
-			break;
-		}
 		sprintf(tempvet,"tempfolder/%d",nfilea);
 		b=fopen(tempvet,"r");
 		newfile++;
+		sprintf(tempvet,"tempfolder/%d",newfile);
 		c=fopen(tempvet,"w");
-		readrega=Div(a,&ra,ds->efield,ds->nfield,nreg);
-
-		re++;
-		readregb=Div(b,&rb,ds->efield,ds->nfield,nreg);
- 
-		re++;
+		merge2files(a,b,c,field,memory,ds,info);
+		fclose(a);
+		fclose(b);
+		fclose(c);
+		info->merge++;
+		info->file++;
 	}
-	info->file=newfile+nfile;
-	info->write=wr+nfile;
-	info->read=re+nfile;
 
-	return 0;
 }
+
 
 
 int main(int argc, char *argv[]){
@@ -218,7 +230,7 @@ printf("\n \n SAIU DO MERGE \n \n");
 
 	sprintf(str,"mv tempfolder/%d %s",info->file,argv[2]);
 	system(str);
-	system("rmdir tempfolder");
+	system("rm -rf tempfolder");
 
 	time(&end);
 	info->time=difftime(end,start);
@@ -234,7 +246,7 @@ printf("\n \n Passo um \n \n");
 	itens.linha[0]=argv[1];
 	for(i=1; i<itens.nitens; i++){
 		itens.linha[i] = (char*)malloc(sizeof(char)*TMS);
-		itens.linha[i][TMS] = EOS;
+		itens.linha[i][TMS-1] = EOS;
 	}
 /*************************/
 printf("\n \n Passo dois \n \n");
@@ -247,10 +259,13 @@ printf("\n \n Passo dois \n \n");
 	sprintf(itens.linha[6], "%d", info->read );
 	sprintf(itens.linha[7], "%d", info->write );
 	sprintf(itens.linha[8], "%lf", info->time );
+
 /**************************/
 printf("\n\n Passo tres \n\n");
 /**************************/
 	WriteCsv("relatorio.csv", itens, "csv.config");				//ARRUMAR DEFINES PARA OS NOMES DOS ARQUIVOS
+	for(i=1;i<itens.nitens;i++) free(itens.linha[i]);
+	free(itens.linha); 
 
 /***************************/
 printf("\n\n Final do programa \n\n");

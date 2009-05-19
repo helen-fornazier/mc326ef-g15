@@ -728,12 +728,12 @@ int TabletoStr(char **str, REGIS reg, int nregis, int tamregis, int nfield){
 			straux+=k;
 		}
 		
-		sprintf(straux, "\n%c", EOS);			//no final do registro coloca \n
+		sprintf(straux, "\n");			//no final do registro coloca \n
 
 		straux++;
 	
 	}
-
+	sprintf(straux,"\0");
 	return i;
 
 }
