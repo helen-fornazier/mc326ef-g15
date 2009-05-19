@@ -29,7 +29,7 @@ int FirstOrder(FILE *f, int field, int memory, DATASTYLE *ds, int *totreg){
 		readreg=Div(f,&matrix,ds->efield,ds->nfield,nreg);
 		*totreg+=readreg;
 		if(readreg==0) break;
-		quickSort(0,nreg-1,matrix,field);
+		quickSort(0,readreg-1,matrix,field);
 		nfile++;
 		sprintf(tempstr,"tempfolder/%d",nfile);
 		out=fopen(tempstr,"w");
