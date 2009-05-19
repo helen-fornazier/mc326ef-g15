@@ -7,7 +7,7 @@
 #define TAMS 100
 #define TMS 10
 
- 
+
 typedef struct information{
 	int write, read, file, merge, totreg;
 	double time;
@@ -53,7 +53,12 @@ int MergeSort(int nfile, int field, int memory, DATASTYLE *ds, INFORMATION *info
 	int re=0,wr=0;
 	char *str=NULL;
 
-	if(nfile<=1) return 1;
+	if(nfile<=1){ 
+		info->file=nfile;
+		info->write=nfile;
+		info->read=nfile;
+		return 1;
+	}
 
 	nfilea=1;
 	sprintf(tempvet,"tempfolder/%d",nfilea);
@@ -63,14 +68,26 @@ int MergeSort(int nfile, int field, int memory, DATASTYLE *ds, INFORMATION *info
 	b=fopen(tempvet,"r");
 	newfile=nfile+1;
 	sprintf(tempvet,"tempfolder/%d",newfile);
+/**********************************/
+printf("\n\n %d %d \n \n",nfile,nfilea);
+/***********************************/
 	c=fopen(tempvet,"w");
 	readrega=Div(a,&ra,ds->efield,ds->nfield,nreg);
 	re++;
 	readregb=Div(b,&rb,ds->efield,ds->nfield,nreg);
 	re++;
+	
+/***************************************/
+printf("\n\n Dentro do merge, antes do loop \n \n");
+	/**********************************/
+	
 	while(1){
 		i=j=k=0;
 		while(1){
+/**********************************/
+printf("teste loop 1\n");
+/***********************************/
+			
 			temp=strcmp(ra[i][field],rb[j][field]);
 			if(temp<0){
 				rc[k++]=ra[i++];
@@ -159,9 +176,9 @@ int MergeSort(int nfile, int field, int memory, DATASTYLE *ds, INFORMATION *info
  
 		re++;
 	}
-	info->file=newfile;
-	info->write=wr;
-	info->read=re;
+	info->file=newfile+nfile;
+	info->write=wr+nfile;
+	info->read=re+nfile;
 
 	return 0;
 }
@@ -190,8 +207,15 @@ int main(int argc, char *argv[]){
 
 	temp=FirstOrder(f,field,memory,data,&(info->totreg));
 	fclose(f);
+/*********************************/
+printf("\n\nantes do merge\n\n");
+/**********************************/
 	MergeSort(temp,field,memory,data,info);
-	
+
+/********************************/
+printf("\n \n SAIU DO MERGE \n \n");
+/*********************************/
+
 	sprintf(str,"mv tempfolder/%d %s",info->file,argv[2]);
 	system(str);
 	system("rmdir tempfolder");
@@ -199,7 +223,9 @@ int main(int argc, char *argv[]){
 	time(&end);
 	info->time=difftime(end,start);
 	info->merge=info->file-temp;
-
+/**************************/
+printf("\n \n Passo um \n \n");
+/**************************/
 	ITENS itens;
 	itens.nitens=9;
 	itens.linha=(char**)malloc(sizeof(char*)*itens.nitens);
@@ -210,7 +236,9 @@ int main(int argc, char *argv[]){
 		itens.linha[i] = (char*)malloc(sizeof(char)*TMS);
 		itens.linha[i][TMS] = EOS;
 	}
-
+/*************************/
+printf("\n \n Passo dois \n \n");
+/*************************/
 	sprintf(itens.linha[1], "%d", info->totreg );
 	sprintf(itens.linha[2], "%d", memory );
 	sprintf(itens.linha[3], "%d", field );
@@ -219,8 +247,14 @@ int main(int argc, char *argv[]){
 	sprintf(itens.linha[6], "%d", info->read );
 	sprintf(itens.linha[7], "%d", info->write );
 	sprintf(itens.linha[8], "%lf", info->time );
-
+/**************************/
+printf("\n\n Passo tres \n\n");
+/**************************/
 	WriteCsv("relatorio.csv", itens, "csv.config");				//ARRUMAR DEFINES PARA OS NOMES DOS ARQUIVOS
+
+/***************************/
+printf("\n\n Final do programa \n\n");
+/***************************/
 	return 0;
 }
 
